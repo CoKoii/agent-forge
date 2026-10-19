@@ -1,0 +1,18 @@
+#!/bin/sh
+
+message=$(head -n 1 "$1")
+
+if ! printf '%s\n' "$message" | grep -Eq '^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-zA-Z0-9._/-]+\))?!?: .+'; then
+  echo ""
+  echo "提交信息格式错误！"
+  echo "格式：类型(可选范围): 中文描述"
+  echo "示例："
+  echo "  feat: 添加用户登录"
+  echo "  fix(auth): 修复登录失败问题"
+  echo "  docs: 更新项目说明"
+  echo "  refactor: 重构工作流模块"
+  echo ""
+  exit 1
+fi
+
+exit 0
