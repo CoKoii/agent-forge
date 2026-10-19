@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "license": "UNLICENSED",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "build": "nest build",
     "deploy": "nest deploy",
@@ -11,17 +11,20 @@
     "start": "nest start",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "test": "vp test run",
-    "test:watch": "vp test watch",
-    "test:cov": "vp test run --coverage",
-    "test:debug": "vp test --inspect-brk --no-file-parallelism",
-    "test:e2e": "vp test run test/"
+    "test": "vp test run --config ../../vite.config.ts --dir .",
+    "test:watch": "vp test watch --config ../../vite.config.ts --dir .",
+    "test:cov": "vp test run --coverage --config ../../vite.config.ts --dir .",
+    "test:debug": "vp test --inspect-brk --no-file-parallelism --config ../../vite.config.ts --dir .",
+    "test:e2e": "vp test run --config ../../vite.config.ts --dir . test/app.e2e-spec.ts"
   },
   "dependencies": {
     "@nestjs/common": "^12.0.1",
+    "@nestjs/config": "catalog:",
     "@nestjs/core": "^12.0.1",
+    "@nestjs/mapped-types": "*",
     "@nestjs/observe": "^0.3.0",
     "@nestjs/platform-express": "^12.0.1",
+    "joi": "catalog:",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },
