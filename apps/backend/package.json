@@ -10,12 +10,7 @@
     "dev": "nest start --watch",
     "start": "nest start",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
-    "test": "vp test run --config ../../vite.config.ts --dir .",
-    "test:watch": "vp test watch --config ../../vite.config.ts --dir .",
-    "test:cov": "vp test run --coverage --config ../../vite.config.ts --dir .",
-    "test:debug": "vp test --inspect-brk --no-file-parallelism --config ../../vite.config.ts --dir .",
-    "test:e2e": "vp test run --config ../../vite.config.ts --dir . test/app.e2e-spec.ts"
+    "start:prod": "node dist/main"
   },
   "dependencies": {
     "@nestjs/common": "catalog:",

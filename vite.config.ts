@@ -19,7 +19,7 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    include: ["**/*.spec.ts", "**/*.e2e-spec.ts"],
+    include: ["**/*.test.ts", "**/*.spec.ts", "**/*.e2e-spec.ts"],
   },
   run: {
     cache: true,
