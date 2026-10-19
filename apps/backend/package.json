@@ -25,8 +25,10 @@
     "@nestjs/observe": "^0.3.0",
     "@nestjs/platform-express": "^12.0.1",
     "joi": "catalog:",
+    "nest-winston": "catalog:",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "winston": "catalog:"
   },
   "devDependencies": {
     "@nestjs/cli": "^12.0.0",
