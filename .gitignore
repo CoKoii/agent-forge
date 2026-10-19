@@ -34,3 +34,26 @@ dist-ssr
 !.vscode/
 !.vscode/settings.json
 !.vscode/extensions.json
+
+# Build and test artifacts
+build
+*.tsbuildinfo
+coverage
+.nyc_output
+.temp
+.tmp
+
+# Runtime files
+pids
+*.pid
+*.seed
+*.pid.lock
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Additional editor files
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
