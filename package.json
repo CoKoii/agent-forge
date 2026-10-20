@@ -4,8 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "ready": "vp check && vp run -r test && vp run -r build",
-    "dev": "vp run website#dev"
+    "check": "vp check",
+    "test": "vp test run",
+    "build": "pnpm --recursive --if-present run build",
+    "ready": "pnpm run check && pnpm run test && pnpm run build",
+    "dev": "vp run --parallel --filter website --filter backend dev"
   },
   "devDependencies": {
     "vite-plus": "catalog:"

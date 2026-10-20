@@ -1,0 +1,33 @@
+name: agent-forge
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-agent_forge}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?请配置 deploy/.env 中的 DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE:-agent_forge}
+
+    ports:
+      - "127.0.0.1:${DB_PORT:-5432}:5432"
+
+    volumes:
+      - postgres-data:/var/lib/postgresql
+
+    healthcheck:
+      test: ["CMD-SHELL", 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  postgres-data:
