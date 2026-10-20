@@ -7,6 +7,7 @@ import { ObserveInfrastructureModule } from "./infrastructure/observe/observe.mo
 import { LoggerModule } from "./infrastructure/logger/logger.module";
 import { DatabaseModule } from "./infrastructure/database/database.module";
 import { AppConfigModule } from "./config/config.module";
+import { ProfileModule } from "./modules/iam/profile/profile.module";
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { AppConfigModule } from "./config/config.module";
     DatabaseModule,
     AuthModule,
     HealthModule,
+    ProfileModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
