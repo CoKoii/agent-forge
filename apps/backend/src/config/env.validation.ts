@@ -1,7 +1,31 @@
 import joi from "joi";
 
 export const envValidationSchema = joi.object({
-  // 应用
+  // =========================基础服务配置=========================
+  // 生产环境/开发环境
+  NODE_ENV: joi.string().default("development"),
+
+  // 端口
+  PORT: joi.number().port().default(3000),
+
+  // 日志等级
+  LOG_LEVEL: joi.string().default("info"),
+
+  // CORS 跨域
+  CORS_ORIGIN: joi.string().default("*"),
+
+  // Observe
   OBSERVE_APP_KEY: joi.string().allow("").default(""),
   OBSERVE_APP_SECRET: joi.string().allow("").default(""),
+  // =========================基础服务配置=========================
+
+  // =========================数据库配置=========================
+  DB_HOST: joi.string().min(1).required(),
+  DB_PORT: joi.number().port().required(),
+  DB_USERNAME: joi.string().min(1).required(),
+  DB_PASSWORD: joi.string().min(1).required(),
+  DB_DATABASE: joi.string().min(1).required(),
+  // 数据库连接池
+  DB_POOL_MAX: joi.number().integer().min(1).max(100).required(),
+  // =========================数据库配置=========================
 });

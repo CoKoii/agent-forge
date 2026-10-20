@@ -10,7 +10,7 @@
     "dev": "nest start --watch",
     "start": "nest start",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main"
+    "start:prod": "NODE_ENV=production node dist/main"
   },
   "dependencies": {
     "@nestjs/common": "catalog:",
@@ -20,10 +20,13 @@
     "@nestjs/observe": "catalog:",
     "@nestjs/platform-express": "catalog:",
     "@nestjs/throttler": "catalog:",
+    "@nestjs/typeorm": "catalog:",
     "joi": "catalog:",
     "nest-winston": "catalog:",
+    "pg": "catalog:",
     "reflect-metadata": "catalog:",
     "rxjs": "catalog:",
+    "typeorm": "catalog:",
     "winston": "catalog:"
   },
   "devDependencies": {
@@ -33,6 +36,7 @@
     "@nestjs/testing": "catalog:",
     "@types/express": "catalog:",
     "@types/node": "catalog:",
+    "@types/pg": "catalog:",
     "@types/supertest": "catalog:",
     "supertest": "catalog:",
     "typescript": "catalog:nest",
