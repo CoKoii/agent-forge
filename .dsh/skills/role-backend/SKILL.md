@@ -21,8 +21,8 @@ description: >
 
 ## 二、工作流程
 
-1. 阅读相关需求文件及验收标准。
-2. 阅读 `docs/architecture/` 中相关架构设计和 API 契约。
+1. 阅读 `team/requirements/registry.md` 和相关模块需求及验收标准。
+2. 阅读 `team/architecture/` 中相关架构设计和 API 契约。
 3. 检查现有代码和项目配置。
 4. 阅读 `references/后端开发规范.md`。
 5. 明确修改范围、接口行为、数据影响和权限要求。

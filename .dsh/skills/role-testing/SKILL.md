@@ -21,16 +21,16 @@ description: >
 
 ## 二、工作流程
 
-1. 阅读 `requirements/README.md`、`requirements/registry.md` 和相关模块需求。
-2. 阅读适用的架构文档及 API 契约。
-3. 检查现有测试目录、测试脚本和测试工具配置。
+1. 阅读 `team/README.md`、`team/requirements/README.md`、索引和相关模块需求。
+2. 阅读 `team/architecture/` 中适用的设计和 API 契约。
+3. 检查现有测试目录、测试脚本和工具配置。
 4. 阅读 `references/测试规范.md`。
-5. 根据验收标准制定测试场景。
-6. 为新增测试用例分配 `TC-模块名-NNN` 编号。
+5. 按验收标准制定测试场景。
+6. 由测试 Agent 分配 `TC-MODULE-NNN` 编号，并关联至少一个 AC。
 7. 优先复用现有测试设施，编写或更新测试。
 8. 执行适用的测试命令。
-9. 分析失败并保存实际结果。
-10. 使用 `references/测试报告模板.md` 汇报结果。
+9. 分析失败并记录实际结果。
+10. 使用 `references/测试报告模板.md` 输出结果。需要保留可追溯报告时，存入 `team/testing/reports/`；测试计划存入 `team/testing/plans/`。
 
 ## 三、测试规则
 

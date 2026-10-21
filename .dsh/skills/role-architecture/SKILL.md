@@ -34,7 +34,7 @@ description: >
 
 ## 三、工作流程
 
-1. 阅读 `requirements/README.md`、需求索引和相关模块需求。
+1. 阅读 `team/README.md`、`team/requirements/README.md`、需求索引和相关模块需求。
 2. 检查现有架构文档、代码结构和项目约定。
 3. 判断任务是否需要新增架构设计或修改现有设计。
 4. 分析模块边界、接口、数据模型、依赖和兼容性。
@@ -57,15 +57,15 @@ description: >
 
 ## 五、文档存储位置
 
-架构文档统一存放在 `docs/architecture/`：
+持久化架构文档统一存放在 `team/architecture/`：
 
-- `README.md`：架构文档索引与维护约定。
+- `README.md`：架构文档索引。
 - `system-design.md`：系统结构、模块职责和依赖关系。
 - `api-contracts.md`：前后端接口契约。
 - `data-model.md`：数据模型与迁移约定。
 - `decisions/`：重大技术决策记录。
 
-目录或文件不存在时，先检查现有仓库；确需新增时再创建。不得覆盖或删除未经确认的已有设计。
+按需创建文件，不要为简单任务生成空文档。写入前检查现有设计；不得覆盖或删除未经确认的内容。
 
 ## 六、职责边界
 

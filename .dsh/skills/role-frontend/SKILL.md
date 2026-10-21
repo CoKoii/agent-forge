@@ -20,8 +20,8 @@ description: >
 
 ## 二、工作流程
 
-1. 阅读相关需求文件，确认需求编号和验收标准。
-2. 检查 `docs/architecture/` 中适用的架构与 API 契约。
+1. 阅读 `team/requirements/registry.md` 和相关模块需求，确认需求编号与验收标准。
+2. 检查 `team/architecture/` 中适用的架构与 API 契约。
 3. 阅读相关代码和 `references/前端开发规范.md`。
 4. 确认组件、页面、路由和接口的修改范围。
 5. 实现功能，优先复用现有组件和项目约定。

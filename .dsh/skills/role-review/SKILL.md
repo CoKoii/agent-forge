@@ -19,11 +19,11 @@ description: >
 ## 工作流程
 
 1. 明确审查范围和变更目的。
-2. 阅读相关需求与架构文档。
+2. 阅读 `team/requirements/` 中的需求与 `team/architecture/` 中相关设计。
 3. 检查 Git diff 及相关上下文代码。
 4. 按需读取 `references/代码审查规范.md`。
 5. 核查测试代码和实际测试结果。
-6. 按 `references/审查报告模板.md` 输出结论。
+6. 按 `references/审查报告模板.md` 输出结论；需留档时存入 `team/reviews/`。
 7. 将阻塞问题和风险明确反馈给协调者。
 
 ## 审查原则
