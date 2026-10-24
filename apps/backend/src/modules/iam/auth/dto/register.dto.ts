@@ -1,7 +1,10 @@
-import { IsString, IsStrongPassword } from "class-validator";
+import { IsNotEmpty, IsString, IsStrongPassword, MaxLength, MinLength } from "class-validator";
 
 export class RegisterDto {
-  @IsString()
+  @IsString({ message: "用户名必须是字符串" })
+  @IsNotEmpty({ message: "用户名不能为空" })
+  @MaxLength(50, { message: "用户名长度不能超过50个字符" })
+  @MinLength(6, { message: "用户名长度不能少于6个字符" })
   username: string;
 
   @IsStrongPassword(
@@ -16,6 +19,7 @@ export class RegisterDto {
   )
   password: string;
 
-  @IsString()
+  @IsString({ message: "确认密码必须是字符串" })
+  @IsNotEmpty({ message: "确认密码不能为空" })
   confirmPassword: string;
 }

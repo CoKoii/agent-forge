@@ -3,6 +3,7 @@ import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 import { AppModule } from "./app.module";
 import { ObserveInstrument } from "./infrastructure/observe/observe.module";
 import { ConfigService } from "@nestjs/config";
+import { ValidationPipe } from "@nestjs/common";
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     // Observe 追踪配置(https://www.observe.nestjs.com)
@@ -10,6 +11,14 @@ async function bootstrap() {
     // 启动日志缓冲配置
     bufferLogs: true,
   });
+
+  // 全局验证管道配置
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
 
   const configService = app.get(ConfigService);
 

@@ -24,6 +24,7 @@ catalog:
   "@types/supertest": ^7.0.0
   bumpp: ^12.3.0
   class-validator: ^0.14.2
+  class-transformer: ^0.5.1
   joi: ^18.3.0
   nest-winston: ^2.0.0
   reflect-metadata: ^0.2.2
