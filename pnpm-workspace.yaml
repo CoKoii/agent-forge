@@ -23,6 +23,7 @@ catalog:
   "@types/pg": ^8.23.1
   "@types/supertest": ^7.0.0
   bumpp: ^12.3.0
+  class-validator: ^0.14.2
   joi: ^18.3.0
   nest-winston: ^2.0.0
   reflect-metadata: ^0.2.2

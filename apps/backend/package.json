@@ -21,6 +21,7 @@
     "@nestjs/platform-express": "catalog:",
     "@nestjs/throttler": "catalog:",
     "@nestjs/typeorm": "catalog:",
+    "class-validator": "catalog:",
     "joi": "catalog:",
     "nest-winston": "catalog:",
     "pg": "catalog:",
