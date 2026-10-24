@@ -19,6 +19,7 @@
     "@nestjs/mapped-types": "catalog:",
     "@nestjs/observe": "catalog:",
     "@nestjs/platform-express": "catalog:",
+    "@nestjs/platform-fastify": "catalog:",
     "@nestjs/throttler": "catalog:",
     "@nestjs/typeorm": "catalog:",
     "class-transformer": "catalog:",

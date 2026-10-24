@@ -1,17 +1,17 @@
-import { NestFactory } from "@nestjs/core";
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 import { AppModule } from "./app.module";
 import { ObserveInstrument } from "./infrastructure/observe/observe.module";
+import { FastifyAdapter, type NestFastifyApplication } from "@nestjs/platform-fastify";
+import { NestFactory } from "@nestjs/core";
 import { ConfigService } from "@nestjs/config";
 import { ValidationPipe, VersioningType } from "@nestjs/common";
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
+  const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter(), {
     // Observe 追踪配置(https://www.observe.nestjs.com)
     instrument: ObserveInstrument,
     // 启动日志缓冲配置
     bufferLogs: true,
   });
-
   const configService = app.get(ConfigService);
 
   // 全局验证管道配置
