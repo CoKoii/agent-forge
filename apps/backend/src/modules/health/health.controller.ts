@@ -6,7 +6,6 @@ import { UpdateHealthDto } from "./dto/update-health.dto";
 @Controller("health")
 export class HealthController {
   constructor(private readonly healthService: HealthService) {}
-
   @Post()
   create(@Body() createHealthDto: CreateHealthDto) {
     return this.healthService.create(createHealthDto);
