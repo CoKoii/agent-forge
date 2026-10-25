@@ -8,6 +8,7 @@ import { LoggerModule } from "./infrastructure/logger/logger.module";
 import { DatabaseModule } from "./infrastructure/database/database.module";
 import { AppConfigModule } from "./config/config.module";
 import { ProfileModule } from "./modules/iam/profile/profile.module";
+import { UserModule } from "./modules/iam/user/user.module";
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ProfileModule } from "./modules/iam/profile/profile.module";
     AuthModule,
     HealthModule,
     ProfileModule,
+    UserModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

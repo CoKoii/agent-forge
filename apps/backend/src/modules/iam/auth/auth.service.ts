@@ -1,26 +1,39 @@
-import { Injectable } from "@nestjs/common";
-import { CreateAuthDto } from "./dto/create-auth.dto";
-import { UpdateAuthDto } from "./dto/update-auth.dto";
+import { BadRequestException, ConflictException, Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { User } from "../user/entities/user.entity";
+import { LoginDto } from "./dto/login.dto";
+import { RegisterDto } from "./dto/register.dto";
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return "This action adds a new auth";
-  }
+  constructor(@InjectRepository(User) private readonly users: Repository<User>) {}
 
-  findAll() {
-    return `This action returns all auth`;
+  //  =========================注册接口=========================
+  async register(registerDto: RegisterDto) {
+    const { username, password, confirmPassword } = registerDto;
+    // 核验密码
+    if (password !== confirmPassword) {
+      throw new BadRequestException("密码和确认密码不一致");
+    }
+    // 核验用户名
+    const existingUser = await this.users.findOne({ where: { username } });
+    if (existingUser) {
+      throw new ConflictException("用户名已存在");
+    }
+    // 创建用户和资料
+    await this.users.save(
+      this.users.create({ username, password, profile: { nickname: username } }),
+    );
+    return {
+      message: "注册成功",
+    };
   }
+  //  =========================注册接口=========================
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
+  //  =========================登录接口=========================
+  login(loginDto: LoginDto) {
+    return loginDto;
   }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
-  }
+  //  =========================登录接口=========================
 }
