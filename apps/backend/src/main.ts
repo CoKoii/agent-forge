@@ -6,6 +6,7 @@ import { HttpAdapterHost, NestFactory } from "@nestjs/core";
 import { ConfigService } from "@nestjs/config";
 import { BadRequestException, ValidationPipe, VersioningType } from "@nestjs/common";
 import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
+import { ResponseInterceptor } from "./common/interceptors/response.interceptor";
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter(), {
     // Observe 追踪配置(https://www.observe.nestjs.com)
@@ -17,6 +18,9 @@ async function bootstrap() {
 
   // 全局异常过滤器配置
   app.useGlobalFilters(new HttpExceptionFilter(app.get(HttpAdapterHost)));
+
+  // 全局响应拦截器配置
+  app.useGlobalInterceptors(new ResponseInterceptor());
 
   // 全局验证管道配置
   app.useGlobalPipes(

@@ -25,15 +25,13 @@ export class AuthService {
     await this.users.save(
       this.users.create({ username, password, profile: { nickname: username } }),
     );
-    return {
-      message: "注册成功",
-    };
+    return "注册成功";
   }
   //  =========================注册接口=========================
 
   //  =========================登录接口=========================
   login(loginDto: LoginDto) {
-    return loginDto;
+    return { username: loginDto.username };
   }
   //  =========================登录接口=========================
 }
