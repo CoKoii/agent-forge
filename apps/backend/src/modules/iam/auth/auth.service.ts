@@ -4,6 +4,7 @@ import { Repository } from "typeorm";
 import { User } from "../user/entities/user.entity";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
+import * as argon2 from "argon2";
 
 @Injectable()
 export class AuthService {
@@ -21,9 +22,13 @@ export class AuthService {
     if (existingUser) {
       throw new ConflictException("用户名已存在");
     }
+    // 密码加密
+    const passwordHash = await argon2.hash(password, {
+      type: argon2.argon2id,
+    });
     // 创建用户和资料
     await this.users.save(
-      this.users.create({ username, password, profile: { nickname: username } }),
+      this.users.create({ username, password: passwordHash, profile: { nickname: username } }),
     );
     return "注册成功";
   }

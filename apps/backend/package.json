@@ -21,6 +21,7 @@
     "@nestjs/platform-fastify": "catalog:",
     "@nestjs/throttler": "catalog:",
     "@nestjs/typeorm": "catalog:",
+    "argon2": "catalog:",
     "class-transformer": "catalog:",
     "class-validator": "catalog:",
     "joi": "catalog:",
