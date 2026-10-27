@@ -1,4 +1,9 @@
-import { BadRequestException, ConflictException, Injectable } from "@nestjs/common";
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User } from "../user/entities/user.entity";
@@ -35,8 +40,13 @@ export class AuthService {
   //  =========================注册接口=========================
 
   //  =========================登录接口=========================
-  login(loginDto: LoginDto) {
-    return { username: loginDto.username };
+  async login(loginDto: LoginDto) {
+    const { username, password } = loginDto;
+    const user = await this.users.findOne({ where: { username } });
+    if (!user || !(await argon2.verify(user.password, password))) {
+      throw new UnauthorizedException("用户名或密码错误");
+    }
+    return { username: user.username };
   }
   //  =========================登录接口=========================
 }
