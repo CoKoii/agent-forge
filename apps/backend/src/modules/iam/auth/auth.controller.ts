@@ -1,7 +1,6 @@
 import { Body, Controller, HttpCode, HttpStatus, Post, Res } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import type { FastifyReply } from "fastify";
-import "@fastify/cookie";
 import { AuthService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
@@ -31,6 +30,7 @@ export class AuthController {
       httpOnly: true,
       secure: this.config.getOrThrow<string>("NODE_ENV") === "production",
       sameSite: "lax",
+      path: "/",
       maxAge: refreshTokenTtl,
     });
 
