@@ -17,7 +17,6 @@ export class AuthController {
   register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
   }
-
   //  =========================注册接口=========================
 
   //  =========================登录接口=========================
