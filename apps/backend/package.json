@@ -13,9 +13,11 @@
     "start:prod": "NODE_ENV=production node dist/main"
   },
   "dependencies": {
+    "@fastify/cookie": "catalog:",
     "@nestjs/common": "catalog:",
     "@nestjs/config": "catalog:",
     "@nestjs/core": "catalog:",
+    "@nestjs/jwt": "catalog:",
     "@nestjs/mapped-types": "catalog:",
     "@nestjs/observe": "catalog:",
     "@nestjs/platform-fastify": "catalog:",
@@ -24,6 +26,7 @@
     "argon2": "catalog:",
     "class-transformer": "catalog:",
     "class-validator": "catalog:",
+    "fastify": "catalog:",
     "joi": "catalog:",
     "nest-winston": "catalog:",
     "pg": "catalog:",

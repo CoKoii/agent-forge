@@ -12,11 +12,24 @@ export const envValidationSchema = joi.object({
   LOG_LEVEL: joi.string().default("info"),
 
   // CORS 跨域
-  CORS_ORIGIN: joi.string().default("*"),
+  CORS_ORIGIN: joi
+    .string()
+    .min(1)
+    .required()
+    .custom((value: string, helpers) =>
+      value.split(",").some((origin) => origin.trim() === "*")
+        ? helpers.error("any.invalid")
+        : value,
+    ),
 
   // Observe
   OBSERVE_APP_KEY: joi.string().allow("").default(""),
   OBSERVE_APP_SECRET: joi.string().allow("").default(""),
+
+  // JWT
+  JWT_SECRET: joi.string().min(32).required(),
+  JWT_ACCESS_TTL_SECONDS: joi.number().integer().min(60).default(900),
+  REFRESH_TOKEN_TTL_SECONDS: joi.number().integer().min(60).default(604800),
   // =========================基础服务配置=========================
 
   // =========================数据库配置=========================

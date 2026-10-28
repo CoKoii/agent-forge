@@ -1,21 +1,17 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  HttpStatus,
-  HttpCode,
-} from "@nestjs/common";
+import { Body, Controller, HttpCode, HttpStatus, Post, Res } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import type { FastifyReply } from "fastify";
+import "@fastify/cookie";
 import { AuthService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
 
 @Controller("auth")
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly config: ConfigService,
+  ) {}
 
   //  =========================注册接口=========================
   @Post("register")
@@ -28,33 +24,17 @@ export class AuthController {
   //  =========================登录接口=========================
   @Post("login")
   @HttpCode(HttpStatus.OK)
-  login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+  async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) reply: FastifyReply) {
+    const { refreshToken, refreshTokenTtl, ...response } = await this.authService.login(loginDto);
+
+    reply.setCookie("refresh_token", refreshToken, {
+      httpOnly: true,
+      secure: this.config.getOrThrow<string>("NODE_ENV") === "production",
+      sameSite: "lax",
+      maxAge: refreshTokenTtl,
+    });
+
+    return response;
   }
   //  =========================登录接口=========================
-
-  // @Post()
-  // create(@Body() createAuthDto: CreateAuthDto) {
-  //   return this.authService.create(createAuthDto);
-  // }
-
-  // @Get()
-  // findAll() {
-  //   return this.authService.findAll();
-  // }
-
-  // @Get(":id")
-  // findOne(@Param("id") id: string) {
-  //   return this.authService.findOne(+id);
-  // }
-
-  // @Patch(":id")
-  // update(@Param("id") id: string, @Body() updateAuthDto: UpdateAuthDto) {
-  //   return this.authService.update(+id, updateAuthDto);
-  // }
-
-  // @Delete(":id")
-  // remove(@Param("id") id: string) {
-  //   return this.authService.remove(+id);
-  // }
 }

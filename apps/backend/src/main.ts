@@ -7,6 +7,8 @@ import { ConfigService } from "@nestjs/config";
 import { BadRequestException, ValidationPipe, VersioningType } from "@nestjs/common";
 import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
 import { ResponseInterceptor } from "./common/interceptors/response.interceptor";
+import fastifyCookie from "@fastify/cookie";
+
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter(), {
     // Observe 追踪配置(https://www.observe.nestjs.com)
@@ -43,9 +45,12 @@ async function bootstrap() {
   app.enableShutdownHooks();
 
   // CORS 配置
-  const corsOrigin = configService.getOrThrow<string>("CORS_ORIGIN");
   app.enableCors({
-    origin: corsOrigin === "*" ? true : corsOrigin.split(",").map((o) => o.trim()),
+    origin: configService
+      .getOrThrow<string>("CORS_ORIGIN")
+      .split(",")
+      .map((origin) => origin.trim()),
+    credentials: true,
   });
 
   // 全局路由前缀配置
@@ -56,6 +61,9 @@ async function bootstrap() {
     type: VersioningType.URI,
     defaultVersion: "1",
   });
+
+  // cookie 配置
+  await app.register(fastifyCookie);
 
   // 端口配置
   const port = configService.getOrThrow<number>("PORT");
