@@ -23,7 +23,7 @@ export class AuthController {
   @Post("login")
   @HttpCode(HttpStatus.OK)
   async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) reply: FastifyReply) {
-    const { refreshToken, refreshTokenTtl, ...response } = await this.authService.login(loginDto);
+    const { accessToken, refreshToken, refreshTokenTtl } = await this.authService.login(loginDto);
 
     reply.setCookie("refresh_token", refreshToken, {
       httpOnly: true,
@@ -33,7 +33,7 @@ export class AuthController {
       maxAge: refreshTokenTtl,
     });
 
-    return response;
+    return { accessToken };
   }
   //  =========================登录接口=========================
 }

@@ -50,32 +50,28 @@ export class AuthService {
   //  =========================注册接口=========================
 
   //  =========================登录接口=========================
-  async login(loginDto: LoginDto) {
-    const { username, password } = loginDto;
+  async login({ username, password }: LoginDto) {
+    // 查找用户
     const user = await this.users.findOne({ where: { username } });
 
+    // 验证用户和密码
     if (!user || !(await argon2.verify(user.passwordHash, password))) {
       throw new UnauthorizedException("用户名或密码错误");
     }
 
+    // 生成 accessToken 和 refreshToken
     const refreshTokenTtl = this.config.getOrThrow<number>("REFRESH_TOKEN_TTL_SECONDS");
     const refreshToken = randomBytes(32).toString("base64url");
     const refreshTokenHash = createHash("sha256").update(refreshToken).digest("hex");
     const expiresAt = new Date(Date.now() + refreshTokenTtl * 1000);
 
-    const accessToken = await this.sessions.manager.transaction(async (manager) => {
+    const session = await this.sessions.manager.transaction(async (manager) => {
       await manager.delete(AuthSession, { user: { id: user.id } });
 
-      const session = await manager.save(
-        manager.create(AuthSession, {
-          user,
-          refreshTokenHash,
-          expiresAt,
-        }),
-      );
-
-      return this.jwt.signAsync({ sub: user.id, sid: session.id });
+      return manager.save(manager.create(AuthSession, { user, refreshTokenHash, expiresAt }));
     });
+
+    const accessToken = await this.jwt.signAsync({ sub: user.id, sid: session.id });
 
     return { accessToken, refreshToken, refreshTokenTtl };
   }
