@@ -1,26 +1,16 @@
-import { Injectable } from "@nestjs/common";
-import { CreateHealthDto } from "./dto/create-health.dto";
-import { UpdateHealthDto } from "./dto/update-health.dto";
+import { Injectable, ServiceUnavailableException } from "@nestjs/common";
+import { DataSource } from "typeorm";
 
 @Injectable()
 export class HealthService {
-  create(createHealthDto: CreateHealthDto) {
-    return "This action adds a new health";
-  }
+  constructor(private readonly dataSource: DataSource) {}
 
-  findAll() {
-    return `This action returns all health`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} health`;
-  }
-
-  update(id: number, updateHealthDto: UpdateHealthDto) {
-    return `This action updates a #${id} health`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} health`;
+  async check() {
+    try {
+      await this.dataSource.query("SELECT 1");
+      return { status: "ok" };
+    } catch {
+      throw new ServiceUnavailableException("Database unavailable");
+    }
   }
 }
