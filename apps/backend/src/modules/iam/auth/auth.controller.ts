@@ -1,9 +1,12 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Res } from "@nestjs/common";
+import { Body, Controller, HttpCode, HttpStatus, Post, Req, Res } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import type { FastifyReply } from "fastify";
+import type { FastifyReply, FastifyRequest } from "fastify";
 import { AuthService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
+import { Public } from "../../../common/decorators/public.decorator";
+
+type AuthTokens = Awaited<ReturnType<AuthService["login"]>>;
 
 @Controller("auth")
 export class AuthController {
@@ -13,17 +16,34 @@ export class AuthController {
   ) {}
 
   //  =========================注册接口=========================
+  @Public()
   @Post("register")
-  register(@Body() registerDto: RegisterDto) {
-    return this.authService.register(registerDto);
+  register(@Body() registerDto: RegisterDto, @Res({ passthrough: true }) reply: FastifyReply) {
+    return this.respondWithTokens(reply, this.authService.register(registerDto));
   }
   //  =========================注册接口=========================
 
+  //  =========================刷新令牌接口=========================
+  @Public()
+  @Post("refresh")
+  @HttpCode(HttpStatus.OK)
+  refresh(@Req() request: FastifyRequest, @Res({ passthrough: true }) reply: FastifyReply) {
+    return this.respondWithTokens(reply, this.authService.refresh(request.cookies?.refresh_token));
+  }
+  //  =========================刷新令牌接口=========================
+
   //  =========================登录接口=========================
+  @Public()
   @Post("login")
   @HttpCode(HttpStatus.OK)
-  async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) reply: FastifyReply) {
-    const { accessToken, refreshToken, refreshTokenTtl } = await this.authService.login(loginDto);
+  login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) reply: FastifyReply) {
+    return this.respondWithTokens(reply, this.authService.login(loginDto));
+  }
+  //  =========================登录接口=========================
+
+  //  =========================共享方法=========================
+  private async respondWithTokens(reply: FastifyReply, tokens: Promise<AuthTokens>) {
+    const { accessToken, refreshToken, refreshTokenTtl } = await tokens;
 
     reply.setCookie("refresh_token", refreshToken, {
       httpOnly: true,
@@ -35,5 +55,5 @@ export class AuthController {
 
     return { accessToken };
   }
-  //  =========================登录接口=========================
+  //  =========================共享方法=========================
 }

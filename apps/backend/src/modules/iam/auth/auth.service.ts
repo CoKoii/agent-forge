@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { type EntityManager, Repository } from "typeorm";
 import { User } from "../user/entities/user.entity";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
@@ -25,55 +25,124 @@ export class AuthService {
     private readonly config: ConfigService,
   ) {}
 
+  private getRefreshTokenTtl() {
+    return this.config.getOrThrow<number>("REFRESH_TOKEN_TTL_SECONDS");
+  }
+
+  private createRefreshToken() {
+    return randomBytes(32).toString("base64url");
+  }
+
+  private hashRefreshToken(token: string) {
+    return createHash("sha256").update(token).digest("hex");
+  }
+
+  private async createTokenResponse(
+    userId: number,
+    sessionId: number,
+    refreshToken: string,
+    refreshTokenTtl: number,
+  ) {
+    return {
+      accessToken: await this.jwt.signAsync({ sub: userId, sid: sessionId }),
+      refreshToken,
+      refreshTokenTtl,
+    };
+  }
+
+  private async createSessionTokens(manager: EntityManager, user: User) {
+    const refreshTokenTtl = this.getRefreshTokenTtl();
+    const refreshToken = this.createRefreshToken();
+    const session = await manager.save(
+      manager.create(AuthSession, {
+        user,
+        refreshTokenHash: this.hashRefreshToken(refreshToken),
+        expiresAt: new Date(Date.now() + refreshTokenTtl * 1000),
+      }),
+    );
+
+    return { session, refreshToken, refreshTokenTtl };
+  }
+
   //  =========================注册接口=========================
   async register(registerDto: RegisterDto) {
     const { username, password, confirmPassword } = registerDto;
-    // 核验密码
+
     if (password !== confirmPassword) {
       throw new BadRequestException("密码和确认密码不一致");
     }
-    // 核验用户名
+
     const existingUser = await this.users.findOne({ where: { username } });
     if (existingUser) {
       throw new ConflictException("用户名已存在");
     }
-    // 密码加密
+
     const passwordHash = await argon2.hash(password, {
       type: argon2.argon2id,
     });
-    // 创建用户和资料
-    await this.users.save(
-      this.users.create({ username, passwordHash, profile: { nickname: username } }),
+    const { user, session, refreshToken, refreshTokenTtl } = await this.users.manager.transaction(
+      async (manager) => {
+        const user = await manager.save(
+          manager.create(User, {
+            username,
+            passwordHash,
+            profile: { nickname: username },
+          }),
+        );
+
+        return { user, ...(await this.createSessionTokens(manager, user)) };
+      },
     );
-    return "注册成功";
+
+    return this.createTokenResponse(user.id, session.id, refreshToken, refreshTokenTtl);
   }
   //  =========================注册接口=========================
 
   //  =========================登录接口=========================
   async login({ username, password }: LoginDto) {
-    // 查找用户
     const user = await this.users.findOne({ where: { username } });
 
-    // 验证用户和密码
     if (!user || !(await argon2.verify(user.passwordHash, password))) {
       throw new UnauthorizedException("用户名或密码错误");
     }
 
-    // 生成 accessToken 和 refreshToken
-    const refreshTokenTtl = this.config.getOrThrow<number>("REFRESH_TOKEN_TTL_SECONDS");
-    const refreshToken = randomBytes(32).toString("base64url");
-    const refreshTokenHash = createHash("sha256").update(refreshToken).digest("hex");
-    const expiresAt = new Date(Date.now() + refreshTokenTtl * 1000);
+    const { session, refreshToken, refreshTokenTtl } = await this.sessions.manager.transaction(
+      async (manager) => {
+        await manager.delete(AuthSession, { user: { id: user.id } });
+        return this.createSessionTokens(manager, user);
+      },
+    );
 
-    const session = await this.sessions.manager.transaction(async (manager) => {
-      await manager.delete(AuthSession, { user: { id: user.id } });
-
-      return manager.save(manager.create(AuthSession, { user, refreshTokenHash, expiresAt }));
-    });
-
-    const accessToken = await this.jwt.signAsync({ sub: user.id, sid: session.id });
-
-    return { accessToken, refreshToken, refreshTokenTtl };
+    return this.createTokenResponse(user.id, session.id, refreshToken, refreshTokenTtl);
   }
   //  =========================登录接口=========================
+
+  //  =========================刷新令牌接口=========================
+  async refresh(rawRefreshToken: string | undefined) {
+    if (!rawRefreshToken) {
+      throw new UnauthorizedException("Refresh token 无效或已过期");
+    }
+
+    const refreshTokenTtl = this.getRefreshTokenTtl();
+    const refreshToken = this.createRefreshToken();
+    const refreshTokenHash = this.hashRefreshToken(rawRefreshToken);
+    const nextRefreshTokenHash = this.hashRefreshToken(refreshToken);
+    const expiresAt = new Date(Date.now() + refreshTokenTtl * 1000);
+
+    const session = await this.sessions.findOne({
+      where: { refreshTokenHash },
+      relations: { user: true },
+    });
+
+    if (!session || session.expiresAt.getTime() <= Date.now()) {
+      throw new UnauthorizedException("Refresh token 无效或已过期");
+    }
+
+    session.refreshTokenHash = nextRefreshTokenHash;
+    session.expiresAt = expiresAt;
+    await this.sessions.save(session);
+
+    return this.createTokenResponse(session.user.id, session.id, refreshToken, refreshTokenTtl);
+  }
+  //  =========================刷新令牌接口=========================
 }
