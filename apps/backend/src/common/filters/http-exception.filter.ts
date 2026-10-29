@@ -16,11 +16,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost): void {
     const { httpAdapter } = this.adapterHost;
     const context = host.switchToHttp();
-    const { method, url, id } = context.getRequest<{
-      method?: string;
-      url?: string;
-      id?: string;
-    }>();
+    const { method, url, id } = context.getRequest();
     const path = (url ?? "/").split("?", 1)[0] || "/";
     const response = context.getResponse();
     const status = exception instanceof HttpException ? exception.getStatus() : 500;
@@ -34,11 +30,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     if (httpAdapter.isHeadersSent(response)) return;
 
     const detail =
-      status >= 500
-        ? "服务器内部错误"
-        : exception instanceof HttpException
-          ? exception.message
-          : "请求失败";
+      exception instanceof HttpException && status < 500 ? exception.message : "服务器内部错误";
 
     httpAdapter.reply(
       response,

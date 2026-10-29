@@ -28,7 +28,7 @@ export const envValidationSchema = joi.object({
 
   // JWT
   JWT_SECRET: joi.string().min(32).required(),
-  JWT_ACCESS_TTL_SECONDS: joi.number().integer().min(60).default(900),
+  ACCESS_TOKEN_TTL_SECONDS: joi.number().integer().min(60).default(900),
   REFRESH_TOKEN_TTL_SECONDS: joi.number().integer().min(60).default(604800),
   // =========================基础服务配置=========================
 

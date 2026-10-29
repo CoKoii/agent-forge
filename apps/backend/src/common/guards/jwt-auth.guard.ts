@@ -2,7 +2,6 @@ import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from
 import { Reflector } from "@nestjs/core";
 import { JwtService } from "@nestjs/jwt";
 import { IS_PUBLIC_KEY } from "../decorators/public.decorator";
-import type { AuthenticatedRequest, AuthenticatedUser } from "../types/authenticated-user.type";
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -21,12 +20,12 @@ export class JwtAuthGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
+    const request = context.switchToHttp().getRequest();
     const [scheme, token] = request.headers.authorization?.split(" ") ?? [];
     if (scheme !== "Bearer" || !token) throw new UnauthorizedException("缺少访问令牌");
 
     try {
-      const payload = await this.jwt.verifyAsync<AuthenticatedUser>(token);
+      const payload = await this.jwt.verifyAsync(token);
       if (!Number.isInteger(payload.sub) || !Number.isInteger(payload.sid)) {
         throw new UnauthorizedException("访问令牌无效");
       }
