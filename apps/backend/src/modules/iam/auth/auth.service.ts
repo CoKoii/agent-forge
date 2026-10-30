@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { IsNull, MoreThan, type EntityManager, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { User } from "../user/entities/user.entity";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
@@ -50,11 +50,11 @@ export class AuthService {
     };
   }
 
-  private async createSessionTokens(manager: EntityManager, user: User) {
+  private async createSessionTokens(user: User) {
     const refreshTokenTtl = this.getRefreshTokenTtl();
     const refreshToken = this.createRefreshToken();
-    const session = await manager.save(
-      manager.create(AuthSession, {
+    const session = await this.sessions.save(
+      this.sessions.create({
         user,
         refreshTokenHash: this.hashRefreshToken(refreshToken),
         expiresAt: new Date(Date.now() + refreshTokenTtl * 1000),
@@ -80,19 +80,14 @@ export class AuthService {
     const passwordHash = await argon2.hash(password, {
       type: argon2.argon2id,
     });
-    const { user, session, refreshToken, refreshTokenTtl } = await this.users.manager.transaction(
-      async (manager) => {
-        const user = await manager.save(
-          manager.create(User, {
-            username,
-            passwordHash,
-            profile: { nickname: username },
-          }),
-        );
-
-        return { user, ...(await this.createSessionTokens(manager, user)) };
-      },
+    const user = await this.users.save(
+      this.users.create({
+        username,
+        passwordHash,
+        profile: { nickname: username },
+      }),
     );
+    const { session, refreshToken, refreshTokenTtl } = await this.createSessionTokens(user);
 
     return this.createTokenResponse(user.id, session.id, refreshToken, refreshTokenTtl);
   }
@@ -105,12 +100,8 @@ export class AuthService {
       throw new UnauthorizedException("用户名或密码错误");
     }
 
-    const { session, refreshToken, refreshTokenTtl } = await this.sessions.manager.transaction(
-      async (manager) => {
-        await manager.delete(AuthSession, { user: { id: user.id } });
-        return this.createSessionTokens(manager, user);
-      },
-    );
+    await this.sessions.delete({ user: { id: user.id } });
+    const { session, refreshToken, refreshTokenTtl } = await this.createSessionTokens(user);
 
     return this.createTokenResponse(user.id, session.id, refreshToken, refreshTokenTtl);
   }
@@ -129,33 +120,19 @@ export class AuthService {
     const refreshTokenTtl = this.getRefreshTokenTtl();
     const refreshToken = this.createRefreshToken();
     const refreshTokenHash = this.hashRefreshToken(rawRefreshToken);
-    const nextRefreshTokenHash = this.hashRefreshToken(refreshToken);
-    const expiresAt = new Date(Date.now() + refreshTokenTtl * 1000);
 
     const session = await this.sessions.findOne({
       where: { refreshTokenHash },
       relations: { user: true },
     });
 
-    if (
-      !session ||
-      (
-        await this.sessions.update(
-          {
-            id: session.id,
-            refreshTokenHash,
-            expiresAt: MoreThan(new Date()),
-            deletedAt: IsNull(),
-          },
-          {
-            refreshTokenHash: nextRefreshTokenHash,
-            expiresAt,
-          },
-        )
-      ).affected !== 1
-    ) {
+    if (!session || session.expiresAt <= new Date() || session.deletedAt) {
       throw new UnauthorizedException("Refresh token 无效或已过期");
     }
+
+    session.refreshTokenHash = this.hashRefreshToken(refreshToken);
+    session.expiresAt = new Date(Date.now() + refreshTokenTtl * 1000);
+    await this.sessions.save(session);
 
     return this.createTokenResponse(session.user.id, session.id, refreshToken, refreshTokenTtl);
   }
