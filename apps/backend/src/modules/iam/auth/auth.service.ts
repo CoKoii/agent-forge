@@ -114,7 +114,7 @@ export class AuthService {
   //  =========================刷新令牌接口=========================
   async refresh(rawRefreshToken: string | undefined) {
     if (!rawRefreshToken) {
-      throw new UnauthorizedException("Refresh token 无效或已过期");
+      throw new UnauthorizedException("登录状态已失效，请重新登录");
     }
 
     const refreshTokenTtl = this.getRefreshTokenTtl();
@@ -127,7 +127,7 @@ export class AuthService {
     });
 
     if (!session || session.expiresAt <= new Date() || session.deletedAt) {
-      throw new UnauthorizedException("Refresh token 无效或已过期");
+      throw new UnauthorizedException("登录状态已失效，请重新登录");
     }
 
     session.refreshTokenHash = this.hashRefreshToken(refreshToken);
