@@ -6,6 +6,7 @@ import { HealthService } from "./health.service";
 export class HealthController {
   constructor(private readonly healthService: HealthService) {}
 
+  //  =========================健康检查接口=========================
   @Public()
   @Get()
   check() {
