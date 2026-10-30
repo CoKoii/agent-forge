@@ -1,22 +1,26 @@
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 import { AppModule } from "./app.module";
 import { ObserveInstrument } from "./infrastructure/observe/observe.module";
-import { FastifyAdapter, type NestFastifyApplication } from "@nestjs/platform-fastify";
 import { HttpAdapterHost, NestFactory } from "@nestjs/core";
 import { ConfigService } from "@nestjs/config";
 import { BadRequestException, ValidationPipe, VersioningType } from "@nestjs/common";
 import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
 import { ResponseInterceptor } from "./common/interceptors/response.interceptor";
-import fastifyCookie from "@fastify/cookie";
+import { NodeAdapter, type NestNodeApplication } from "@nestjs/platform-node";
+import cookieParser from "cookie-parser";
+import { requestIdMiddleware } from "./common/middleware/request-id.middleware";
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter(), {
+  const app = await NestFactory.create<NestNodeApplication>(AppModule, new NodeAdapter(), {
     // Observe 追踪配置(https://www.observe.nestjs.com)
     instrument: ObserveInstrument,
     // 启动日志缓冲配置
     bufferLogs: true,
   });
   const configService = app.get(ConfigService);
+
+  // 生成请求 ID，供响应和异常日志关联
+  app.use(requestIdMiddleware);
 
   // 全局异常过滤器配置
   app.useGlobalFilters(new HttpExceptionFilter(app.get(HttpAdapterHost)));
@@ -63,7 +67,7 @@ async function bootstrap() {
   });
 
   // cookie 配置
-  await app.register(fastifyCookie);
+  app.use(cookieParser());
 
   // 端口配置
   const port = configService.getOrThrow<number>("PORT");

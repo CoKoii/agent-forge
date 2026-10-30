@@ -1,6 +1,6 @@
 import { Body, Controller, HttpCode, HttpStatus, Post, Req, Res } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import type { FastifyReply, FastifyRequest } from "fastify";
+import type { NodeRequest, NodeResponse } from "@nestjs/platform-node";
 import { AuthService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
@@ -18,7 +18,7 @@ export class AuthController {
   //  =========================注册接口=========================
   @Public()
   @Post("register")
-  register(@Body() registerDto: RegisterDto, @Res({ passthrough: true }) reply: FastifyReply) {
+  register(@Body() registerDto: RegisterDto, @Res({ passthrough: true }) reply: NodeResponse) {
     return this.respondWithTokens(reply, this.authService.register(registerDto));
   }
 
@@ -26,7 +26,10 @@ export class AuthController {
   @Public()
   @Post("refresh")
   @HttpCode(HttpStatus.OK)
-  refresh(@Req() request: FastifyRequest, @Res({ passthrough: true }) reply: FastifyReply) {
+  refresh(
+    @Req() request: NodeRequest & { cookies?: Record<string, string> },
+    @Res({ passthrough: true }) reply: NodeResponse,
+  ) {
     return this.respondWithTokens(reply, this.authService.refresh(request.cookies?.refresh_token));
   }
 
@@ -34,7 +37,7 @@ export class AuthController {
   @Public()
   @Post("login")
   @HttpCode(HttpStatus.OK)
-  login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) reply: FastifyReply) {
+  login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) reply: NodeResponse) {
     return this.respondWithTokens(reply, this.authService.login(loginDto));
   }
 
@@ -42,8 +45,8 @@ export class AuthController {
   @Post("logout")
   @HttpCode(HttpStatus.NO_CONTENT)
   async logout(
-    @Req() request: FastifyRequest & { user: { sub: number; sid: number } },
-    @Res({ passthrough: true }) reply: FastifyReply,
+    @Req() request: NodeRequest & { user: { sub: number; sid: number } },
+    @Res({ passthrough: true }) reply: NodeResponse,
   ) {
     await this.authService.logout(request.user.sub, request.user.sid);
     reply.clearCookie("refresh_token", this.getRefreshCookieOptions());
@@ -59,12 +62,12 @@ export class AuthController {
     };
   }
 
-  private async respondWithTokens(reply: FastifyReply, tokens: Promise<AuthTokens>) {
+  private async respondWithTokens(reply: NodeResponse, tokens: Promise<AuthTokens>) {
     const { accessToken, refreshToken, refreshTokenTtl } = await tokens;
 
-    reply.setCookie("refresh_token", refreshToken, {
+    reply.cookie("refresh_token", refreshToken, {
       ...this.getRefreshCookieOptions(),
-      maxAge: refreshTokenTtl,
+      maxAge: refreshTokenTtl * 1000,
     });
 
     return { accessToken };
