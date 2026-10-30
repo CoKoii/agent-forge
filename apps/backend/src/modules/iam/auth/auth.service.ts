@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { type EntityManager, Repository } from "typeorm";
+import { IsNull, MoreThan, type EntityManager, Repository } from "typeorm";
 import { User } from "../user/entities/user.entity";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
@@ -134,13 +134,25 @@ export class AuthService {
       relations: { user: true },
     });
 
-    if (!session || session.expiresAt.getTime() <= Date.now()) {
+    if (
+      !session ||
+      (
+        await this.sessions.update(
+          {
+            id: session.id,
+            refreshTokenHash,
+            expiresAt: MoreThan(new Date()),
+            deletedAt: IsNull(),
+          },
+          {
+            refreshTokenHash: nextRefreshTokenHash,
+            expiresAt,
+          },
+        )
+      ).affected !== 1
+    ) {
       throw new UnauthorizedException("Refresh token 无效或已过期");
     }
-
-    session.refreshTokenHash = nextRefreshTokenHash;
-    session.expiresAt = expiresAt;
-    await this.sessions.save(session);
 
     return this.createTokenResponse(session.user.id, session.id, refreshToken, refreshTokenTtl);
   }
