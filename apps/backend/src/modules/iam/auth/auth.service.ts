@@ -96,7 +96,6 @@ export class AuthService {
 
     return this.createTokenResponse(user.id, session.id, refreshToken, refreshTokenTtl);
   }
-  //  =========================注册接口=========================
 
   //  =========================登录接口=========================
   async login({ username, password }: LoginDto) {
@@ -115,7 +114,11 @@ export class AuthService {
 
     return this.createTokenResponse(user.id, session.id, refreshToken, refreshTokenTtl);
   }
-  //  =========================登录接口=========================
+
+  //  =========================退出登录接口=========================
+  async logout(userId: number, sessionId: number) {
+    await this.sessions.delete({ id: sessionId, user: { id: userId } });
+  }
 
   //  =========================刷新令牌接口=========================
   async refresh(rawRefreshToken: string | undefined) {
@@ -156,5 +159,4 @@ export class AuthService {
 
     return this.createTokenResponse(session.user.id, session.id, refreshToken, refreshTokenTtl);
   }
-  //  =========================刷新令牌接口=========================
 }
