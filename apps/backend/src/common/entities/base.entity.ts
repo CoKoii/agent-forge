@@ -25,4 +25,7 @@ export abstract class BaseEntity {
 
   @DeleteDateColumn({ comment: "软删除时间", type: "timestamptz" })
   deletedAt!: Date | null;
+
+  @Column({ comment: "删除人ID", type: "integer", nullable: true })
+  deletedBy!: number | null;
 }

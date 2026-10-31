@@ -19,7 +19,7 @@ async function bootstrap() {
   });
   const configService = app.get(ConfigService);
 
-  // 生成请求 ID，供响应和异常日志关联
+  // 生成请求 ID，并初始化请求上下文
   app.use(requestIdMiddleware);
 
   // 全局异常过滤器配置
