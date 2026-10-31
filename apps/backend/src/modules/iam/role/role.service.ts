@@ -1,7 +1,9 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, Repository } from "typeorm";
+import { PageQueryDto } from "../../../common/dto/page-query.dto";
 import { Permission } from "../permission/entities/permission.entity";
+import { getPagination, pageResult } from "../../../common/utils/pagination";
 import { CreateRoleDto, UpdateRoleDto } from "./dto/role.dto";
 import { Role } from "./entities/role.entity";
 
@@ -14,8 +16,16 @@ export class RoleService {
   ) {}
 
   // 查询角色列表
-  findAll() {
-    return this.roles.find({ relations: { permissions: true } });
+  async findAll({ page, pageSize }: PageQueryDto) {
+    const pagination = getPagination(page, pageSize);
+    const [items, total] = await this.roles.findAndCount({
+      relations: { permissions: true },
+      skip: pagination.skip,
+      take: pagination.take,
+      order: { id: "DESC" },
+    });
+
+    return pageResult(items, total, pagination);
   }
 
   // 查询单个角色

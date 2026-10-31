@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
+import { PageQueryDto } from "../../../common/dto/page-query.dto";
+import { getPagination, pageResult } from "../../../common/utils/pagination";
 import { CreatePermissionDto, UpdatePermissionDto } from "./dto/permission.dto";
 import { Permission } from "./entities/permission.entity";
 
@@ -22,8 +24,15 @@ export class PermissionService {
   }
 
   // 查询权限列表
-  findAll() {
-    return this.permissions.find();
+  async findAll({ page, pageSize }: PageQueryDto) {
+    const pagination = getPagination(page, pageSize);
+    const [items, total] = await this.permissions.findAndCount({
+      skip: pagination.skip,
+      take: pagination.take,
+      order: { id: "DESC" },
+    });
+
+    return pageResult(items, total, pagination);
   }
 
   // 查询单个权限

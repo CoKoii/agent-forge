@@ -1,4 +1,15 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+} from "@nestjs/common";
+import { PageQueryDto } from "../../../common/dto/page-query.dto";
 import { Permissions } from "../../../common/decorators/permissions.decorator";
 import { CreatePermissionDto, UpdatePermissionDto } from "./dto/permission.dto";
 import { PermissionService } from "./permission.service";
@@ -11,8 +22,8 @@ export class PermissionController {
 
   // 查询权限列表
   @Get()
-  findAll() {
-    return this.permissions.findAll();
+  findAll(@Query() query: PageQueryDto) {
+    return this.permissions.findAll(query);
   }
 
   // 查询单个权限

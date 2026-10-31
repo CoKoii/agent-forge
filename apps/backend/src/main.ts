@@ -31,6 +31,7 @@ async function bootstrap() {
   // 全局验证管道配置
   app.useGlobalPipes(
     new ValidationPipe({
+      transform: true,
       whitelist: true,
       forbidNonWhitelisted: true,
       exceptionFactory: (errors) => {

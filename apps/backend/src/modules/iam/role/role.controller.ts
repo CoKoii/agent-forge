@@ -1,4 +1,15 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+} from "@nestjs/common";
+import { PageQueryDto } from "../../../common/dto/page-query.dto";
 import { Permissions } from "../../../common/decorators/permissions.decorator";
 import { CreateRoleDto, UpdateRoleDto } from "./dto/role.dto";
 import { RoleService } from "./role.service";
@@ -11,8 +22,8 @@ export class RoleController {
 
   // 查询角色列表
   @Get()
-  findAll() {
-    return this.roles.findAll();
+  findAll(@Query() query: PageQueryDto) {
+    return this.roles.findAll(query);
   }
 
   // 查询单个角色
