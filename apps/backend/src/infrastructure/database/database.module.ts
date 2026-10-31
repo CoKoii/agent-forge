@@ -16,6 +16,8 @@ import { AuditSubscriber } from "../../common/subscribers/audit.subscriber";
         database: cs.getOrThrow("DB_DATABASE"),
         autoLoadEntities: true,
         subscribers: [AuditSubscriber],
+        migrations: [__dirname + "/migrations/*{.js,.ts}"],
+        migrationsRun: cs.get("NODE_ENV") === "production",
         synchronize: cs.get("NODE_ENV") === "development",
         logging: cs.get("NODE_ENV") === "development",
         extra: { max: cs.getOrThrow<number>("DB_POOL_MAX") },
