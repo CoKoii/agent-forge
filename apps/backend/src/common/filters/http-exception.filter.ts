@@ -38,15 +38,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
     if (httpAdapter.isHeadersSent(response)) return;
 
     // 区分客户端错误和服务器内部错误
-    const detail =
+    const message =
       exception instanceof HttpException && status < 500 ? exception.message : "服务器内部错误";
 
     // 返回统一错误响应
     httpAdapter.reply(
       response,
       {
-        status,
-        detail,
+        message,
         requestId: id ?? null,
       },
       status,
