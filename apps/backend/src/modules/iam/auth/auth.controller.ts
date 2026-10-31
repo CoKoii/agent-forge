@@ -1,9 +1,10 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Req, Res } from "@nestjs/common";
+import { Body, Controller, HttpCode, HttpStatus, Patch, Post, Req, Res } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import type { NodeRequest, NodeResponse } from "@nestjs/platform-node";
 import { AuthService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
+import { ChangePasswordDto } from "./dto/change-password.dto";
 import { Public } from "../../../common/decorators/public.decorator";
 
 type AuthTokens = Awaited<ReturnType<AuthService["login"]>>;
@@ -39,6 +40,18 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) reply: NodeResponse) {
     return this.respondWithTokens(reply, this.authService.login(loginDto));
+  }
+
+  //  =========================修改密码接口=========================
+  @Patch("password")
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async changePassword(
+    @Req() request: NodeRequest & { user: { sub: number } },
+    @Body() changePasswordDto: ChangePasswordDto,
+    @Res({ passthrough: true }) reply: NodeResponse,
+  ) {
+    await this.authService.changePassword(request.user.sub, changePasswordDto);
+    reply.clearCookie("refresh_token", this.getRefreshCookieOptions());
   }
 
   //  =========================退出登录接口=========================

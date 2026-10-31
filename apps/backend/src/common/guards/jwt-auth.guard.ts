@@ -11,7 +11,6 @@ import { AuthSession } from "../../modules/iam/auth/entities/auth-session.entity
 import { Reflector } from "@nestjs/core";
 import { JwtService } from "@nestjs/jwt";
 import { IS_PUBLIC_KEY } from "../decorators/public.decorator";
-import { setCurrentUserId } from "../context/request-context";
 
 // 全局 JWT 守卫
 @Injectable()
@@ -70,7 +69,6 @@ export class JwtAuthGuard implements CanActivate {
 
     // 将已验证的用户信息交给后续处理
     request.user = payload;
-    setCurrentUserId(payload.sub!);
     return true;
   }
 }

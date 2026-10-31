@@ -9,6 +9,7 @@ import { Repository } from "typeorm";
 import { User } from "../user/entities/user.entity";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
+import { ChangePasswordDto } from "./dto/change-password.dto";
 import * as argon2 from "argon2";
 import { AuthSession } from "./entities/auth-session.entity";
 import { JwtService } from "@nestjs/jwt";
@@ -102,7 +103,11 @@ export class AuthService {
 
   //  =========================登录接口=========================
   async login({ username, password }: LoginDto) {
-    const user = await this.users.findOne({ where: { username } });
+    const user = await this.users
+      .createQueryBuilder("user")
+      .addSelect("user.passwordHash")
+      .where("user.username = :username", { username })
+      .getOne();
 
     if (!user || !(await argon2.verify(user.passwordHash, password))) {
       throw new UnauthorizedException("用户名或密码错误");
@@ -110,6 +115,30 @@ export class AuthService {
 
     await this.sessions.delete({ user: { id: user.id } });
     return this.createAuthTokens(user);
+  }
+
+  //  =========================修改密码接口=========================
+  async changePassword(
+    userId: number,
+    { oldPassword, newPassword, confirmPassword }: ChangePasswordDto,
+  ) {
+    if (newPassword !== confirmPassword) {
+      throw new BadRequestException("密码和确认密码不一致");
+    }
+
+    const user = await this.users
+      .createQueryBuilder("user")
+      .addSelect("user.passwordHash")
+      .where("user.id = :userId", { userId })
+      .getOne();
+
+    if (!user || !(await argon2.verify(user.passwordHash, oldPassword))) {
+      throw new UnauthorizedException("旧密码错误");
+    }
+
+    user.passwordHash = await argon2.hash(newPassword, { type: argon2.argon2id });
+    await this.users.save(user);
+    await this.sessions.delete({ user: { id: userId } });
   }
 
   //  =========================退出登录接口=========================

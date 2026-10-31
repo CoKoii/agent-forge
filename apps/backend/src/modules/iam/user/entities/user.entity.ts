@@ -7,7 +7,7 @@ export class User extends BaseEntity {
   @Column({ comment: "用户名", length: 50, unique: true })
   username!: string;
 
-  @Column({ comment: "密码哈希" })
+  @Column({ comment: "密码哈希", select: false })
   passwordHash!: string;
 
   @OneToOne(() => Profile, (profile) => profile.user, { cascade: ["insert"] })
