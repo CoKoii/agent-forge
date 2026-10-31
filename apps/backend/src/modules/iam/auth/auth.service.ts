@@ -73,6 +73,7 @@ export class AuthService {
     }
 
     const existingUser = await this.users.findOne({ where: { username } });
+
     if (existingUser) {
       throw new ConflictException("用户名已存在");
     }
@@ -80,6 +81,7 @@ export class AuthService {
     const passwordHash = await argon2.hash(password, {
       type: argon2.argon2id,
     });
+
     const user = await this.users.save(
       this.users.create({
         username,
@@ -87,6 +89,7 @@ export class AuthService {
         profile: { nickname: username },
       }),
     );
+
     const { session, refreshToken, refreshTokenTtl } = await this.createSessionTokens(user);
 
     return this.createTokenResponse(user.id, session.id, refreshToken, refreshTokenTtl);
