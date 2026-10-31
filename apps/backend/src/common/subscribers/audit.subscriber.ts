@@ -18,17 +18,20 @@ export class AuditSubscriber implements EntitySubscriberInterface<BaseEntity> {
 
   // 创建时写入审计字段
   beforeInsert({ entity }: InsertEvent<BaseEntity>) {
+    if (!entity) return;
     const userId = this.getCurrentUserId();
-    Object.assign(entity!, { createdBy: userId, updatedBy: userId });
+    Object.assign(entity, { createdBy: userId, updatedBy: userId });
   }
 
   // 更新时写入修改人
   beforeUpdate({ entity }: UpdateEvent<BaseEntity>) {
-    entity!.updatedBy = this.getCurrentUserId();
+    if (!entity) return;
+    entity.updatedBy = this.getCurrentUserId();
   }
 
   // 软删除时写入删除人
   beforeSoftRemove({ entity }: SoftRemoveEvent<BaseEntity>) {
-    entity!.deletedBy = this.getCurrentUserId();
+    if (!entity) return;
+    entity.deletedBy = this.getCurrentUserId();
   }
 }

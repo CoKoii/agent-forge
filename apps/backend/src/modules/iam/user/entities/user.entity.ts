@@ -1,6 +1,7 @@
-import { Column, Entity, OneToOne } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, OneToOne } from "typeorm";
 import { BaseEntity } from "../../../../common/entities/base.entity";
 import { Profile } from "../../profile/entities/profile.entity";
+import { Role } from "../../role/entities/role.entity";
 
 @Entity({ comment: "用户" })
 export class User extends BaseEntity {
@@ -9,6 +10,10 @@ export class User extends BaseEntity {
 
   @Column({ comment: "密码哈希", select: false })
   passwordHash!: string;
+
+  @ManyToMany(() => Role, (role) => role.users)
+  @JoinTable({ name: "user_role" })
+  roles!: Role[];
 
   @OneToOne(() => Profile, (profile) => profile.user, { cascade: ["insert"] })
   profile!: Profile;
