@@ -15,8 +15,10 @@ import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { createHash, randomBytes } from "node:crypto";
 
+// 认证服务
 @Injectable()
 export class AuthService {
+  // 服务依赖配置
   constructor(
     @InjectRepository(User) private readonly users: Repository<User>,
     @InjectRepository(AuthSession)
@@ -25,18 +27,22 @@ export class AuthService {
     private readonly config: ConfigService,
   ) {}
 
+  // 获取 Refresh Token 有效期
   private getRefreshTokenTtl() {
     return this.config.getOrThrow<number>("REFRESH_TOKEN_TTL_SECONDS");
   }
 
+  // 生成 Refresh Token
   private createRefreshToken() {
     return randomBytes(32).toString("base64url");
   }
 
+  // 哈希 Refresh Token
   private hashRefreshToken(token: string) {
     return createHash("sha256").update(token).digest("hex");
   }
 
+  // 签发访问令牌并返回认证数据
   private async createTokenResponse(
     userId: number,
     sessionId: number,
@@ -50,7 +56,8 @@ export class AuthService {
     };
   }
 
-  private async createSessionTokens(user: User) {
+  // 创建登录会话并签发认证令牌
+  private async createAuthTokens(user: User) {
     const refreshTokenTtl = this.getRefreshTokenTtl();
     const refreshToken = this.createRefreshToken();
     const session = await this.sessions.save(
@@ -61,7 +68,7 @@ export class AuthService {
       }),
     );
 
-    return { session, refreshToken, refreshTokenTtl };
+    return this.createTokenResponse(user.id, session.id, refreshToken, refreshTokenTtl);
   }
 
   //  =========================注册接口=========================
@@ -90,9 +97,7 @@ export class AuthService {
       }),
     );
 
-    const { session, refreshToken, refreshTokenTtl } = await this.createSessionTokens(user);
-
-    return this.createTokenResponse(user.id, session.id, refreshToken, refreshTokenTtl);
+    return this.createAuthTokens(user);
   }
 
   //  =========================登录接口=========================
@@ -104,9 +109,7 @@ export class AuthService {
     }
 
     await this.sessions.delete({ user: { id: user.id } });
-    const { session, refreshToken, refreshTokenTtl } = await this.createSessionTokens(user);
-
-    return this.createTokenResponse(user.id, session.id, refreshToken, refreshTokenTtl);
+    return this.createAuthTokens(user);
   }
 
   //  =========================退出登录接口=========================
