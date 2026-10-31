@@ -56,7 +56,7 @@ export class JwtAuthGuard implements CanActivate {
       session = await this.sessions.findOne({
         where: {
           id: payload.sid!,
-          user: { id: payload.sub! },
+          user: { id: payload.sub!, deletedAt: IsNull() },
           expiresAt: MoreThan(new Date()),
           deletedAt: IsNull(),
         },
