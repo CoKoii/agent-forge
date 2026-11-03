@@ -80,7 +80,7 @@ export class UserService {
 
   // 校验用户名是否可用
   private async ensureUsernameAvailable(username: string, currentUserId?: number) {
-    const user = await this.users.findOne({ where: { username } });
+    const user = await this.users.findOne({ where: { username }, withDeleted: true });
     if (user && user.id !== currentUserId) throw new ConflictException("用户名已存在");
   }
 
