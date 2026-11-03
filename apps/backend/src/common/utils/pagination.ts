@@ -1,20 +1,16 @@
-export const getPagination = (page = 1, pageSize = 20) => {
-  const size = Math.min(Math.max(pageSize, 1), 100);
-  const currentPage = Math.max(page, 1);
+import type { FindManyOptions, ObjectLiteral, Repository } from "typeorm";
+import type { PageQueryDto } from "../dto/page-query.dto";
 
-  return {
-    page: currentPage,
-    pageSize: size,
-    skip: (currentPage - 1) * size,
-    take: size,
-  };
+export const paginate = async <T extends ObjectLiteral>(
+  repository: Repository<T>,
+  { page, pageSize }: PageQueryDto,
+  options: FindManyOptions<T> = {},
+) => {
+  const [items, total] = await repository.findAndCount({
+    ...options,
+    skip: (page - 1) * pageSize,
+    take: pageSize,
+  });
+
+  return { items, total, page, pageSize };
 };
-
-export type Pagination = ReturnType<typeof getPagination>;
-
-export const pageResult = <T>(items: T[], total: number, { page, pageSize }: Pagination) => ({
-  items,
-  total,
-  page,
-  pageSize,
-});

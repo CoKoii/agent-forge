@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Patch,
@@ -10,12 +12,10 @@ import {
   Query,
 } from "@nestjs/common";
 import { PageQueryDto } from "../../../common/dto/page-query.dto";
-import { Permissions } from "../../../common/decorators/permissions.decorator";
 import { CreateRoleDto, UpdateRoleDto } from "./dto/role.dto";
 import { RoleService } from "./role.service";
 
-@Controller("admin/roles")
-@Permissions("role:manage")
+@Controller("roles")
 export class RoleController {
   // 角色管理依赖
   constructor(private readonly roles: RoleService) {}
@@ -46,6 +46,7 @@ export class RoleController {
 
   // 删除角色
   @Delete(":id")
+  @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param("id", ParseIntPipe) id: number) {
     return this.roles.remove(id);
   }

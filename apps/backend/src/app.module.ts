@@ -5,6 +5,7 @@ import { AuthModule } from "./modules/iam/auth/auth.module";
 import { UserModule } from "./modules/iam/user/user.module";
 import { ProfileModule } from "./modules/iam/profile/profile.module";
 import { PermissionModule } from "./modules/iam/permission/permission.module";
+import { RoleModule } from "./modules/iam/role/role.module";
 import { HealthModule } from "./modules/health/health.module";
 import { ObserveInfrastructureModule } from "./infrastructure/observe/observe.module";
 import { LoggerModule } from "./infrastructure/logger/logger.module";
@@ -22,6 +23,7 @@ import { AppConfigModule } from "./config/config.module";
     UserModule,
     ProfileModule,
     PermissionModule,
+    RoleModule,
     HealthModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],

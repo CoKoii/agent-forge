@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Patch,
@@ -10,12 +12,10 @@ import {
   Query,
 } from "@nestjs/common";
 import { PageQueryDto } from "../../../common/dto/page-query.dto";
-import { Permissions } from "../../../common/decorators/permissions.decorator";
 import { CreatePermissionDto, UpdatePermissionDto } from "./dto/permission.dto";
 import { PermissionService } from "./permission.service";
 
-@Controller("admin/permissions")
-@Permissions("permission:manage")
+@Controller("permissions")
 export class PermissionController {
   // 权限管理依赖
   constructor(private readonly permissions: PermissionService) {}
@@ -46,6 +46,7 @@ export class PermissionController {
 
   // 删除权限
   @Delete(":id")
+  @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param("id", ParseIntPipe) id: number) {
     return this.permissions.remove(id);
   }
