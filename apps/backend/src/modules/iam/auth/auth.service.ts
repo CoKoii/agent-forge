@@ -126,11 +126,10 @@ export class AuthService {
       throw new BadRequestException("密码和确认密码不一致");
     }
 
-    const user = await this.users
-      .createQueryBuilder("user")
-      .addSelect("user.passwordHash")
-      .where("user.id = :userId", { userId })
-      .getOne();
+    const user = await this.users.findOne({
+      where: { id: userId },
+      select: { id: true, passwordHash: true },
+    });
 
     if (!user || !(await argon2.verify(user.passwordHash, oldPassword))) {
       throw new UnauthorizedException("旧密码错误");
