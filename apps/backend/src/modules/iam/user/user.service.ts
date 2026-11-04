@@ -39,5 +39,4 @@ export class UserService {
     await this.sessions.delete({ user: { id } });
     await this.users.softRemove(user);
   }
-
 }
