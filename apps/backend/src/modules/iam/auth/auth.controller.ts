@@ -58,13 +58,15 @@ export class AuthController {
 
   //  =========================退出登录接口=========================
   @Post("logout")
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @HttpCode(HttpStatus.OK)
   async logout(
     @Req() request: NodeRequest & { user: { sub: number; sid: number } },
     @Res({ passthrough: true }) reply: NodeResponse,
   ) {
     await this.authService.logout(request.user.sub, request.user.sid);
     reply.clearCookie("refresh_token", this.getRefreshCookieOptions());
+
+    return { message: "退出登录成功" };
   }
 
   //  =========================共享方法=========================
