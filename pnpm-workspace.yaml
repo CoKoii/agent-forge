@@ -1,6 +1,6 @@
 packages:
   - apps/*
-  - '!apps/admin'
+  - "!apps/admin"
   - packages/*
   - tools/*
 
