@@ -19,7 +19,7 @@ import { UpdateUserDto } from "./dto/update-user.dto";
 import { UserService } from "./user.service";
 
 // 用户控制器
-@Controller("users")
+@Controller("user")
 export class UserController {
   // 用户管理依赖
   constructor(private readonly users: UserService) {}
