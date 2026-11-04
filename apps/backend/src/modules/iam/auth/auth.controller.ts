@@ -44,7 +44,7 @@ export class AuthController {
 
   //  =========================修改密码接口=========================
   @Patch("password")
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @HttpCode(HttpStatus.OK)
   async changePassword(
     @Req() request: NodeRequest & { user: { sub: number } },
     @Body() changePasswordDto: ChangePasswordDto,
@@ -52,6 +52,8 @@ export class AuthController {
   ) {
     await this.authService.changePassword(request.user.sub, changePasswordDto);
     reply.clearCookie("refresh_token", this.getRefreshCookieOptions());
+
+    return { message: "密码修改成功" };
   }
 
   //  =========================退出登录接口=========================
