@@ -1,5 +1,4 @@
 import {
-  Body,
   Controller,
   Delete,
   Get,
@@ -7,15 +6,11 @@ import {
   HttpStatus,
   Param,
   ParseIntPipe,
-  Patch,
-  Post,
   Query,
   Req,
 } from "@nestjs/common";
 import type { NodeRequest } from "@nestjs/platform-node";
 import { PageQueryDto } from "../../../common/dto/page-query.dto";
-import { CreateUserDto } from "./dto/create-user.dto";
-import { UpdateUserDto } from "./dto/update-user.dto";
 import { UserService } from "./user.service";
 
 // 用户控制器
@@ -40,18 +35,6 @@ export class UserController {
   @Get(":id")
   findOne(@Param("id", ParseIntPipe) id: number) {
     return this.users.findOne(id);
-  }
-
-  // 创建用户
-  @Post()
-  create(@Body() dto: CreateUserDto) {
-    return this.users.create(dto);
-  }
-
-  // 更新用户
-  @Patch(":id")
-  update(@Param("id", ParseIntPipe) id: number, @Body() dto: UpdateUserDto) {
-    return this.users.update(id, dto);
   }
 
   // 删除用户
