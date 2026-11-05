@@ -39,7 +39,7 @@ export class UserController {
 
   // 删除用户
   @Delete(":id")
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @HttpCode(HttpStatus.OK)
   remove(@Param("id", ParseIntPipe) id: number) {
     return this.users.remove(id);
   }

@@ -17,11 +17,9 @@ export class ResponseInterceptor implements NestInterceptor {
       .getRequest<{ id?: string; user?: { sub: number } }>();
 
     return defer(() => requestContext.run({ userId: user?.sub ?? null }, () => next.handle())).pipe(
-      map((data) => ({
-        data,
-        meta: {
-          requestId: id ?? null,
-        },
+      map((result) => ({
+        code: 0,
+        data: { ...result, requestId: id ?? null },
       })),
     );
   }

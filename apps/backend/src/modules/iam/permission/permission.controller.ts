@@ -46,7 +46,7 @@ export class PermissionController {
 
   // 删除权限
   @Delete(":id")
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @HttpCode(HttpStatus.OK)
   remove(@Param("id", ParseIntPipe) id: number) {
     return this.permissions.remove(id);
   }

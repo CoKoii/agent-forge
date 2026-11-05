@@ -46,7 +46,7 @@ export class RoleController {
 
   // 删除角色
   @Delete(":id")
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @HttpCode(HttpStatus.OK)
   remove(@Param("id", ParseIntPipe) id: number) {
     return this.roles.remove(id);
   }

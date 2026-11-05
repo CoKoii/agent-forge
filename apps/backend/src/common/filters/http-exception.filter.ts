@@ -45,8 +45,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
     httpAdapter.reply(
       response,
       {
+        code: -1,
         message,
-        requestId: id ?? null,
+        data: {
+          requestId: id ?? null,
+        },
       },
       status,
     );
