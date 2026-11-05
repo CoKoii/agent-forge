@@ -1,0 +1,36 @@
+{
+  "name": "@vben/node-utils",
+  "version": "5.8.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "build": "node ./scripts/build.mjs"
+  },
+  "dependencies": {
+    "@changesets/git": "catalog:vben",
+    "@manypkg/get-packages": "catalog:vben",
+    "chalk": "catalog:vben",
+    "consola": "catalog:vben",
+    "dayjs": "catalog:vben",
+    "execa": "catalog:vben",
+    "find-up": "catalog:vben",
+    "ora": "catalog:vben",
+    "pkg-types": "catalog:vben",
+    "rimraf": "catalog:vben"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:vben",
+    "tsdown": "catalog:vben",
+    "typescript": "catalog:vben"
+  }
+}

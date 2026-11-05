@@ -1,0 +1,52 @@
+{
+  "name": "@vben/common-ui",
+  "version": "5.8.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./es/tippy": {
+      "types": "./src/components/tippy/index.ts",
+      "default": "./src/components/tippy/index.ts"
+    },
+    "./es/loading": {
+      "types": "./src/components/loading/index.ts",
+      "default": "./src/components/loading/index.ts"
+    }
+  },
+  "dependencies": {
+    "@vben-core/design": "workspace:*",
+    "@vben-core/form-ui": "workspace:*",
+    "@vben-core/popup-ui": "workspace:*",
+    "@vben-core/preferences": "workspace:*",
+    "@vben-core/shadcn-ui": "workspace:*",
+    "@vben-core/shared": "workspace:*",
+    "@vben/constants": "workspace:*",
+    "@vben/hooks": "workspace:*",
+    "@vben/icons": "workspace:*",
+    "@vben/locales": "workspace:*",
+    "@vben/types": "workspace:*",
+    "@vueuse/core": "catalog:vben",
+    "@vueuse/integrations": "catalog:vben",
+    "json-bigint": "catalog:vben",
+    "qrcode": "catalog:vben",
+    "tippy.js": "catalog:vben",
+    "vue-json-pretty": "catalog:vben",
+    "vue-tippy": "catalog:vben"
+  },
+  "devDependencies": {
+    "@types/json-bigint": "catalog:vben",
+    "@types/qrcode": "catalog:vben",
+    "@vue/test-utils": "catalog:vben"
+  },
+  "peerDependencies": {
+    "vue": "catalog:vben",
+    "vue-router": "catalog:vben"
+  }
+}

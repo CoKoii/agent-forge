@@ -1,0 +1,27 @@
+{
+  "name": "@vben-core/design",
+  "version": "5.8.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "exports": {
+    "./bem": {
+      "development": "./src/scss-bem/bem.scss",
+      "production": "./src/scss-bem/bem.scss",
+      "default": "./dist/bem.scss"
+    },
+    "./theme": {
+      "default": "./src/css/global.css"
+    },
+    ".": {
+      "types": "./src/index.ts",
+      "development": "./src/index.ts",
+      "production": "./src/index.ts",
+      "default": "./dist/design.css"
+    }
+  },
+  "dependencies": {
+    "@iconify/json": "catalog:vben"
+  }
+}

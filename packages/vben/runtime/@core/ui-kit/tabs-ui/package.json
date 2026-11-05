@@ -1,0 +1,32 @@
+{
+  "name": "@vben-core/tabs-ui",
+  "version": "5.8.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "development": "./src/index.ts",
+      "production": "./src/index.ts",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "dependencies": {
+    "@vben-core/composables": "workspace:*",
+    "@vben-core/design": "workspace:*",
+    "@vben-core/icons": "workspace:*",
+    "@vben-core/shadcn-ui": "workspace:*",
+    "@vben-core/typings": "workspace:*",
+    "@vueuse/core": "catalog:vben",
+    "vue": "catalog:vben"
+  },
+  "devDependencies": {
+    "unplugin-vue": "catalog:vben"
+  }
+}

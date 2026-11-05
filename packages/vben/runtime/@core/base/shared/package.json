@@ -1,0 +1,62 @@
+{
+  "name": "@vben-core/shared",
+  "version": "5.8.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    "./constants": {
+      "types": "./src/constants/index.ts",
+      "development": "./src/constants/index.ts",
+      "production": "./src/constants/index.ts",
+      "default": "./dist/constants/index.mjs"
+    },
+    "./utils": {
+      "types": "./src/utils/index.ts",
+      "development": "./src/utils/index.ts",
+      "production": "./src/utils/index.ts",
+      "default": "./dist/utils/index.mjs"
+    },
+    "./color": {
+      "types": "./src/color/index.ts",
+      "development": "./src/color/index.ts",
+      "production": "./src/color/index.ts",
+      "default": "./dist/color/index.mjs"
+    },
+    "./cache": {
+      "types": "./src/cache/index.ts",
+      "development": "./src/cache/index.ts",
+      "production": "./src/cache/index.ts",
+      "default": "./dist/cache/index.mjs"
+    },
+    "./store": {
+      "types": "./src/store.ts",
+      "development": "./src/store.ts",
+      "production": "./src/store.ts",
+      "default": "./dist/store.mjs"
+    },
+    "./global-state": {
+      "types": "./src/global-state.ts",
+      "development": "./src/global-state.ts",
+      "production": "./src/global-state.ts",
+      "default": "./dist/global-state.mjs"
+    }
+  },
+  "dependencies": {
+    "@ctrl/tinycolor": "catalog:vben",
+    "@tanstack/vue-store": "catalog:vben",
+    "@vue/shared": "catalog:vben",
+    "clsx": "catalog:vben",
+    "dayjs": "catalog:vben",
+    "defu": "catalog:vben",
+    "es-toolkit": "catalog:vben",
+    "lodash.clonedeep": "catalog:vben",
+    "nprogress": "catalog:vben",
+    "tailwind-merge": "catalog:vben",
+    "theme-colors": "catalog:vben"
+  },
+  "devDependencies": {
+    "@types/lodash.clonedeep": "catalog:vben",
+    "@types/nprogress": "catalog:vben"
+  }
+}

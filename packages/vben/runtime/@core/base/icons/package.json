@@ -1,0 +1,21 @@
+{
+  "name": "@vben-core/icons",
+  "version": "5.8.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "development": "./src/index.ts",
+      "production": "./src/index.ts",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "dependencies": {
+    "@iconify/vue": "catalog:vben",
+    "@lucide/vue": "catalog:vben",
+    "vue": "catalog:vben"
+  }
+}

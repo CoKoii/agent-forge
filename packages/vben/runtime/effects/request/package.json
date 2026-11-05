@@ -1,0 +1,25 @@
+{
+  "name": "@vben/request",
+  "version": "5.8.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "dependencies": {
+    "@vben/locales": "workspace:*",
+    "@vben/utils": "workspace:*",
+    "axios": "catalog:vben",
+    "qs": "catalog:vben"
+  },
+  "devDependencies": {
+    "@types/qs": "catalog:vben",
+    "axios-mock-adapter": "catalog:vben"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "@vben/tsconfig",
+  "version": "5.8.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@vben/types": "workspace:*",
+    "vite": "catalog:vben"
+  }
+}
