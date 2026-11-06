@@ -7,6 +7,7 @@ import {
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User } from "../user/entities/user.entity";
+import { PermissionService } from "../permission/permission.service";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
 import { ChangePasswordDto } from "./dto/change-password.dto";
@@ -26,6 +27,7 @@ export class AuthService {
     private readonly sessions: Repository<AuthSession>,
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
+    private readonly permissions: PermissionService,
   ) {}
 
   // 获取 Refresh Token 有效期
@@ -117,7 +119,11 @@ export class AuthService {
     return this.createAuthTokens(user);
   }
 
-  //  =========================修改密码接口=========================
+  // 获取当前用户权限编码
+  getAccessCodes(userId: number) {
+    return this.permissions.findCodesByUserId(userId);
+  }
+
   async changePassword(
     userId: number,
     { oldPassword, newPassword, confirmPassword }: ChangePasswordDto,

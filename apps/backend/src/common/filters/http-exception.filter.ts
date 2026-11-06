@@ -47,9 +47,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       {
         code: -1,
         message,
-        data: {
-          requestId: id ?? null,
-        },
+        data: null,
       },
       status,
     );

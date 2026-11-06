@@ -19,8 +19,8 @@ export class UserController {
   // 用户管理依赖
   constructor(private readonly users: UserService) {}
 
-  // 查询当前用户
-  @Get("me")
+  // 查询当前用户信息
+  @Get("info")
   getCurrentUser(@Req() request: NodeRequest & { user: { sub: number } }) {
     return this.users.findOne(request.user.sub);
   }
