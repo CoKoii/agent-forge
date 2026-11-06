@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Patch, Post, Req, Res } from "@nestjs/common";
+import { Body, Controller, HttpCode, HttpStatus, Patch, Post, Req, Res } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import type { NodeRequest, NodeResponse } from "@nestjs/platform-node";
 import { AuthService } from "./auth.service";
@@ -42,12 +42,7 @@ export class AuthController {
     return this.respondWithTokens(reply, this.authService.login(loginDto));
   }
 
-  // =========================获取权限编码=========================
-  @Get("codes")
-  getAccessCodes(@Req() request: NodeRequest & { user: { sub: number } }) {
-    return this.authService.getAccessCodes(request.user.sub);
-  }
-
+  //  =========================修改密码接口=========================
   @Patch("password")
   @HttpCode(HttpStatus.OK)
   async changePassword(

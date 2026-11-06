@@ -8,11 +8,9 @@ import { JwtModule } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { APP_GUARD } from "@nestjs/core";
 import { JwtAuthGuard } from "../../../common/guards/jwt-auth.guard";
-import { PermissionModule } from "../permission/permission.module";
 
 @Module({
   imports: [
-    PermissionModule,
     TypeOrmModule.forFeature([User, AuthSession]),
     JwtModule.registerAsync({
       inject: [ConfigService],

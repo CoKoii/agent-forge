@@ -12,12 +12,14 @@ import { requestContext } from "../context/request-context";
 export class ResponseInterceptor implements NestInterceptor {
   // 统一响应格式
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
-    const { user } = context.switchToHttp().getRequest<{ user?: { sub: number } }>();
+    const { id, user } = context
+      .switchToHttp()
+      .getRequest<{ id?: string; user?: { sub: number } }>();
 
     return defer(() => requestContext.run({ userId: user?.sub ?? null }, () => next.handle())).pipe(
       map((result) => ({
         code: 0,
-        data: result ?? null,
+        data: { ...result, requestId: id ?? null },
       })),
     );
   }

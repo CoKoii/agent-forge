@@ -1,7 +1,7 @@
 {
   "welcomeBack": "欢迎回来",
-  "pageTitle": "开箱即用的大型中后台管理系统",
-  "pageDesc": "工程化、高性能、跨组件库的前端模版",
+  "pageTitle": "基于 Vite Plus+ Monorepo 的 AI 全栈研发框架",
+  "pageDesc": "支持多智能体协作、需求版本管理、变更追踪、可复用 Skills 与自动化 CI/CD，构建从需求分析到代码交付的完整研发工作流",
   "loginSuccess": "登录成功",
   "loginSuccessDesc": "欢迎回来",
   "loginSubtitle": "请输入您的账户信息以开始管理您的项目",

@@ -23,17 +23,6 @@ export class PermissionService {
     return count === new Set(codes).size;
   }
 
-  // 查询用户权限编码
-  async findCodesByUserId(userId: number): Promise<string[]> {
-    const permissions = await this.permissions.find({
-      where: { roles: { users: { id: userId } } },
-      order: { code: "ASC" },
-      relations: { roles: { users: true } },
-    });
-
-    return [...new Set(permissions.map(({ code }) => code))];
-  }
-
   // 查询权限列表
   findAll(query: PageQueryDto) {
     return paginate(this.permissions, query, { order: { id: "DESC" } });
