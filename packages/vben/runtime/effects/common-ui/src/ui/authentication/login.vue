@@ -60,7 +60,7 @@ const router = useRouter();
 
 const REMEMBER_ME_KEY = `REMEMBER_ME_USERNAME_${location.hostname}`;
 
-const localUsername = localStorage.getItem(REMEMBER_ME_KEY) || "";
+const localUsername = props.showRememberMe ? localStorage.getItem(REMEMBER_ME_KEY) || "" : "";
 
 const rememberMe = ref(!!localUsername);
 
@@ -68,7 +68,11 @@ async function handleSubmit() {
   const { valid } = await formApi.validate();
   const values = await formApi.getValues();
   if (valid) {
-    localStorage.setItem(REMEMBER_ME_KEY, rememberMe.value ? values?.username : "");
+    if (props.showRememberMe && rememberMe.value) {
+      localStorage.setItem(REMEMBER_ME_KEY, values?.username || "");
+    } else {
+      localStorage.removeItem(REMEMBER_ME_KEY);
+    }
     emit("submit", values);
   }
 }
@@ -78,7 +82,9 @@ function handleGo(path: string) {
 }
 
 onMounted(() => {
-  if (localUsername) {
+  if (!props.showRememberMe) {
+    localStorage.removeItem(REMEMBER_ME_KEY);
+  } else if (localUsername) {
     formApi.setFieldValue("username", localUsername);
   }
 });
