@@ -11,5 +11,5 @@ export class LoginDto {
 
   @IsBoolean({ message: "验证码必须是布尔值" })
   @IsNotEmpty({ message: "验证码不能为空" })
-  captcha: string;
+  captcha: boolean;
 }
