@@ -8,6 +8,7 @@ import { appCopyrightPreferences, defineOverridesPreferences } from "@vben/prefe
 export const overridesPreferences = defineOverridesPreferences({
   // overrides
   app: {
+    enableRefreshToken: true,
     name: import.meta.env.VITE_APP_TITLE,
   },
   copyright: appCopyrightPreferences,

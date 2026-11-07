@@ -13,7 +13,10 @@ export namespace AuthApi {
   }
 
   export interface RefreshTokenResult {
-    data: string;
+    data: {
+      code: number;
+      data: LoginResult;
+    };
     status: number;
   }
 }
@@ -29,9 +32,12 @@ export async function loginApi(data: AuthApi.LoginParams) {
  * 刷新accessToken
  */
 export async function refreshTokenApi() {
-  return baseRequestClient.post<AuthApi.RefreshTokenResult>("/auth/refresh", undefined, {
-    withCredentials: true,
-  });
+  const response = await baseRequestClient.post<AuthApi.RefreshTokenResult>(
+    "/auth/refresh",
+    undefined,
+    { withCredentials: true },
+  );
+  return response.data.data.accessToken;
 }
 
 /**
