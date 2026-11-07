@@ -97,7 +97,7 @@ export class AuthService {
       this.users.create({
         username,
         passwordHash,
-        profile: { nickname: username },
+        profile: { nickname: username, realName: username },
       }),
     );
 

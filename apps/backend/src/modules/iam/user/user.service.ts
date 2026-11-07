@@ -25,8 +25,10 @@ export class UserService {
   }
 
   // 查询当前用户
-  findCurrent(user: AuthUser) {
-    return this.findOne(user.userId);
+  async findCurrent(currentUser: AuthUser) {
+    const user = await this.findOne(currentUser.userId);
+    const { id: _profileId, ...profile } = user.profile;
+    return { ...profile, roles: user.roles };
   }
   // 查询单个用户
   async findOne(id: number) {

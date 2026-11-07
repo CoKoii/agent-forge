@@ -7,6 +7,9 @@ export class Profile extends BaseEntity {
   @Column({ comment: "昵称", length: 50 })
   nickname!: string;
 
+  @Column({ comment: "真实姓名", length: 50 })
+  realName!: string;
+
   @Column({ comment: "头像", type: "varchar", length: 500, nullable: true })
   avatarUrl!: string | null;
 

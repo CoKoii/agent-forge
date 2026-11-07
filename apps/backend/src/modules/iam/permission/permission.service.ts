@@ -30,7 +30,6 @@ export class PermissionService {
       order: { code: "ASC" },
       relations: { roles: { users: true } },
     });
-
     return [...new Set(permissions.map(({ code }) => code))];
   }
 
