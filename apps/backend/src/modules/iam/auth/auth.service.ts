@@ -148,8 +148,12 @@ export class AuthService {
   }
 
   //  =========================退出登录接口=========================
-  async logout({ userId, sessionId }: AuthUser) {
-    await this.sessions.delete({ id: sessionId, user: { id: userId } });
+  async logout(rawRefreshToken?: string) {
+    if (!rawRefreshToken) return;
+
+    await this.sessions.delete({
+      refreshTokenHash: this.hashRefreshToken(rawRefreshToken),
+    });
   }
 
   //  =========================刷新令牌接口=========================

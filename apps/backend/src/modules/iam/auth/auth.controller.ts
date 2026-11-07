@@ -64,10 +64,14 @@ export class AuthController {
   }
 
   //  =========================退出登录接口=========================
+  @Public()
   @Post("logout")
   @HttpCode(HttpStatus.OK)
-  async logout(@CurrentUser() user: AuthUser, @Res({ passthrough: true }) reply: NodeResponse) {
-    await this.authService.logout(user);
+  async logout(
+    @Req() request: NodeRequest & { cookies?: Record<string, string> },
+    @Res({ passthrough: true }) reply: NodeResponse,
+  ) {
+    await this.authService.logout(request.cookies?.refresh_token);
     reply.clearCookie("refresh_token", this.getRefreshCookieOptions());
 
     return { message: "退出登录成功" };
