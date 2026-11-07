@@ -1,6 +1,8 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Patch, Post, Req, Res } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import type { NodeRequest, NodeResponse } from "@nestjs/platform-node";
+import type { AuthUser } from "../../../common/guards/jwt-auth.guard";
+import { CurrentUser } from "../../../common/decorators/current-user.decorator";
 import { AuthService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
@@ -44,18 +46,18 @@ export class AuthController {
 
   // =========================获取权限编码=========================
   @Get("codes")
-  getAccessCodes(@Req() request: NodeRequest & { user: { sub: number } }) {
-    return this.authService.getAccessCodes(request.user.sub);
+  getAccessCodes(@CurrentUser() user: AuthUser) {
+    return this.authService.getAccessCodes(user);
   }
 
   @Patch("password")
   @HttpCode(HttpStatus.OK)
   async changePassword(
-    @Req() request: NodeRequest & { user: { sub: number } },
+    @CurrentUser() user: AuthUser,
     @Body() changePasswordDto: ChangePasswordDto,
     @Res({ passthrough: true }) reply: NodeResponse,
   ) {
-    await this.authService.changePassword(request.user.sub, changePasswordDto);
+    await this.authService.changePassword(user, changePasswordDto);
     reply.clearCookie("refresh_token", this.getRefreshCookieOptions());
 
     return { message: "密码修改成功" };
@@ -64,11 +66,8 @@ export class AuthController {
   //  =========================退出登录接口=========================
   @Post("logout")
   @HttpCode(HttpStatus.OK)
-  async logout(
-    @Req() request: NodeRequest & { user: { sub: number; sid: number } },
-    @Res({ passthrough: true }) reply: NodeResponse,
-  ) {
-    await this.authService.logout(request.user.sub, request.user.sid);
+  async logout(@CurrentUser() user: AuthUser, @Res({ passthrough: true }) reply: NodeResponse) {
+    await this.authService.logout(user);
     reply.clearCookie("refresh_token", this.getRefreshCookieOptions());
 
     return { message: "退出登录成功" };

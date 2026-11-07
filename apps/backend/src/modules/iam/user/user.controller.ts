@@ -7,22 +7,21 @@ import {
   Param,
   ParseIntPipe,
   Query,
-  Req,
 } from "@nestjs/common";
-import type { NodeRequest } from "@nestjs/platform-node";
+import { CurrentUser } from "../../../common/decorators/current-user.decorator";
+import type { AuthUser } from "../../../common/guards/jwt-auth.guard";
 import { PageQueryDto } from "../../../common/dto/page-query.dto";
 import { UserService } from "./user.service";
 
 // 用户控制器
 @Controller("user")
 export class UserController {
-  // 用户管理依赖
   constructor(private readonly users: UserService) {}
 
   // 查询当前用户信息
   @Get("info")
-  getCurrentUser(@Req() request: NodeRequest & { user: { sub: number } }) {
-    return this.users.findOne(request.user.sub);
+  getCurrentUser(@CurrentUser() user: AuthUser) {
+    return this.users.findCurrent(user);
   }
 
   // 查询用户列表

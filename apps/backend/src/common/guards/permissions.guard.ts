@@ -2,6 +2,7 @@ import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from "@
 import { Reflector } from "@nestjs/core";
 import { IS_PUBLIC_KEY } from "../decorators/public.decorator";
 import { PermissionService } from "../../modules/iam/permission/permission.service";
+import type { AuthUser } from "./jwt-auth.guard";
 
 const REQUIRED_PERMISSIONS_KEY = "requiredPermissions";
 
@@ -25,8 +26,8 @@ export class PermissionsGuard implements CanActivate {
     ]);
     if (isPublic) return true;
 
-    const user = context.switchToHttp().getRequest().user;
-    if (!user?.sub || !(await this.permissions.hasPermissions(user.sub, permissions))) {
+    const user = context.switchToHttp().getRequest<{ user?: AuthUser }>().user;
+    if (!user?.userId || !(await this.permissions.hasPermissions(user.userId, permissions))) {
       throw new ForbiddenException("没有访问权限");
     }
 

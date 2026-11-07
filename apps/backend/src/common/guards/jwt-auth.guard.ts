@@ -12,7 +12,11 @@ import { Reflector } from "@nestjs/core";
 import { JwtService } from "@nestjs/jwt";
 import { IS_PUBLIC_KEY } from "../decorators/public.decorator";
 
-// 全局 JWT 守卫
+export interface AuthUser {
+  userId: number;
+  sessionId: number;
+}
+
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   // 守卫依赖配置
@@ -68,7 +72,10 @@ export class JwtAuthGuard implements CanActivate {
     if (!session) throw new UnauthorizedException("访问令牌无效或已过期");
 
     // 将已验证的用户信息交给后续处理
-    request.user = payload;
+    request.user = {
+      userId: payload.sub!,
+      sessionId: payload.sid!,
+    };
     return true;
   }
 }

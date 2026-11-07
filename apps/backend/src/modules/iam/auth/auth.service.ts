@@ -16,6 +16,7 @@ import { AuthSession } from "./entities/auth-session.entity";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { createHash, randomBytes } from "node:crypto";
+import type { AuthUser } from "../../../common/guards/jwt-auth.guard";
 
 // 认证服务
 @Injectable()
@@ -120,12 +121,12 @@ export class AuthService {
   }
 
   // 获取当前用户权限编码
-  getAccessCodes(userId: number) {
+  getAccessCodes({ userId }: AuthUser) {
     return this.permissions.findCodesByUserId(userId);
   }
 
   async changePassword(
-    userId: number,
+    { userId }: AuthUser,
     { oldPassword, newPassword, confirmPassword }: ChangePasswordDto,
   ) {
     if (newPassword !== confirmPassword) {
@@ -147,7 +148,7 @@ export class AuthService {
   }
 
   //  =========================退出登录接口=========================
-  async logout(userId: number, sessionId: number) {
+  async logout({ userId, sessionId }: AuthUser) {
     await this.sessions.delete({ id: sessionId, user: { id: userId } });
   }
 

@@ -5,6 +5,7 @@ import { PageQueryDto } from "../../../common/dto/page-query.dto";
 import { paginate } from "../../../common/utils/pagination";
 import { AuthSession } from "../auth/entities/auth-session.entity";
 import { User } from "./entities/user.entity";
+import type { AuthUser } from "../../../common/guards/jwt-auth.guard";
 
 // 用户服务
 @Injectable()
@@ -23,6 +24,10 @@ export class UserService {
     });
   }
 
+  // 查询当前用户
+  findCurrent(user: AuthUser) {
+    return this.findOne(user.userId);
+  }
   // 查询单个用户
   async findOne(id: number) {
     const user = await this.users.findOne({

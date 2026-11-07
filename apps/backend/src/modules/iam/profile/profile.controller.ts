@@ -1,5 +1,6 @@
-import { Body, Controller, Get, Patch, Req } from "@nestjs/common";
-import type { NodeRequest } from "@nestjs/platform-node";
+import { Body, Controller, Get, Patch } from "@nestjs/common";
+import { CurrentUser } from "../../../common/decorators/current-user.decorator";
+import type { AuthUser } from "../../../common/guards/jwt-auth.guard";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
 import { ProfileService } from "./profile.service";
 
@@ -10,16 +11,13 @@ export class ProfileController {
 
   // 查询当前资料
   @Get()
-  getCurrentProfile(@Req() request: NodeRequest & { user: { sub: number } }) {
-    return this.profileService.getCurrentProfile(request.user.sub);
+  getCurrentProfile(@CurrentUser() user: AuthUser) {
+    return this.profileService.getCurrentProfile(user);
   }
 
   // 更新当前资料
   @Patch()
-  updateCurrentProfile(
-    @Req() request: NodeRequest & { user: { sub: number } },
-    @Body() updateDto: UpdateProfileDto,
-  ) {
-    return this.profileService.updateCurrentProfile(request.user.sub, updateDto);
+  updateCurrentProfile(@CurrentUser() user: AuthUser, @Body() updateDto: UpdateProfileDto) {
+    return this.profileService.updateCurrentProfile(user, updateDto);
   }
 }

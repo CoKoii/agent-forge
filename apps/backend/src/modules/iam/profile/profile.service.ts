@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
 import { Profile } from "./entities/profile.entity";
+import type { AuthUser } from "../../../common/guards/jwt-auth.guard";
 
 // 个人资料服务
 @Injectable()
@@ -11,7 +12,7 @@ export class ProfileService {
   constructor(@InjectRepository(Profile) private readonly profiles: Repository<Profile>) {}
 
   // 查询当前资料
-  async getCurrentProfile(userId: number) {
+  async getCurrentProfile({ userId }: AuthUser) {
     const profile = await this.profiles.findOne({
       where: { user: { id: userId } },
     });
@@ -21,7 +22,7 @@ export class ProfileService {
   }
 
   // 更新当前资料
-  async updateCurrentProfile(userId: number, updateDto: UpdateProfileDto) {
+  async updateCurrentProfile({ userId }: AuthUser, updateDto: UpdateProfileDto) {
     if (!Object.keys(updateDto).length) {
       throw new BadRequestException("至少提供一个资料字段");
     }
