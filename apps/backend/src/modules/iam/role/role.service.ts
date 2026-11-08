@@ -1,9 +1,7 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { In, Repository } from "typeorm";
-import { PageQueryDto } from "../../../common/dto/page-query.dto";
+import { In, QueryFailedError, Repository } from "typeorm";
 import { Permission } from "../permission/entities/permission.entity";
-import { paginate } from "../../../common/utils/pagination";
 import { CreateRoleDto, UpdateRoleDto } from "./dto/role.dto";
 import { Role } from "./entities/role.entity";
 
@@ -15,9 +13,8 @@ export class RoleService {
     @InjectRepository(Permission) private readonly permissions: Repository<Permission>,
   ) {}
 
-  // 查询角色列表
-  findAll(query: PageQueryDto) {
-    return paginate(this.roles, query, {
+  findAll() {
+    return this.roles.find({
       relations: { permissions: true },
       order: { id: "DESC" },
     });
@@ -36,7 +33,7 @@ export class RoleService {
       ...data,
       permissions: await this.getPermissions(permissionIds),
     });
-    return this.roles.save(role);
+    return this.saveRole(role);
   }
 
   // 更新角色和权限
@@ -44,13 +41,24 @@ export class RoleService {
     const role = await this.findOne(id);
     Object.assign(role, data);
     if (permissionIds) role.permissions = await this.getPermissions(permissionIds);
-    return this.roles.save(role);
+    return this.saveRole(role);
   }
 
   // 软删除角色
   async remove(id: number) {
     const role = await this.findOne(id);
     await this.roles.softRemove(role);
+  }
+
+  private async saveRole(role: Role) {
+    try {
+      return await this.roles.save(role);
+    } catch (error) {
+      if (error instanceof QueryFailedError && error.driverError?.code === "23505") {
+        throw new ConflictException("角色编码已存在");
+      }
+      throw error;
+    }
   }
 
   // 加载角色权限

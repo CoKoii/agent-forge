@@ -9,9 +9,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
-  Query,
 } from "@nestjs/common";
-import { PageQueryDto } from "../../../common/dto/page-query.dto";
 import { CreateRoleDto, UpdateRoleDto } from "./dto/role.dto";
 import { RoleService } from "./role.service";
 
@@ -22,8 +20,8 @@ export class RoleController {
 
   // 查询角色列表
   @Get()
-  findAll(@Query() query: PageQueryDto) {
-    return this.roles.findAll(query);
+  findAll() {
+    return this.roles.findAll();
   }
 
   // 查询单个角色

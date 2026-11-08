@@ -15,6 +15,6 @@ export class User extends BaseEntity {
   @JoinTable({ name: "user_role" })
   roles!: Role[];
 
-  @OneToOne(() => Profile, (profile) => profile.user, { cascade: ["insert"] })
+  @OneToOne(() => Profile, (profile) => profile.user, { cascade: ["insert", "update"] })
   profile!: Profile;
 }

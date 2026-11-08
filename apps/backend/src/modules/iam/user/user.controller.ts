@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
@@ -6,11 +7,13 @@ import {
   HttpStatus,
   Param,
   ParseIntPipe,
+  Patch,
   Query,
 } from "@nestjs/common";
 import { CurrentUser } from "../../../common/decorators/current-user.decorator";
 import type { AuthUser } from "../../../common/guards/jwt-auth.guard";
 import { UserListQueryDto } from "./dto/user-list-query.dto";
+import { UpdateUserDto } from "./dto/update-user.dto";
 import { UserService } from "./user.service";
 
 // 用户控制器
@@ -34,6 +37,12 @@ export class UserController {
   @Get(":id")
   findOne(@Param("id", ParseIntPipe) id: number) {
     return this.users.findOne(id);
+  }
+
+  // 更新用户
+  @Patch(":id")
+  update(@Param("id", ParseIntPipe) id: number, @Body() dto: UpdateUserDto) {
+    return this.users.update(id, dto);
   }
 
   // 删除用户

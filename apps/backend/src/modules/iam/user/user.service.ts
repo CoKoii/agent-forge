@@ -1,8 +1,10 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { UserListQueryDto } from "./dto/user-list-query.dto";
+import { UpdateUserDto } from "./dto/update-user.dto";
 import { AuthSession } from "../auth/entities/auth-session.entity";
+import { Role } from "../role/entities/role.entity";
 import { User } from "./entities/user.entity";
 import type { AuthUser } from "../../../common/guards/jwt-auth.guard";
 
@@ -20,6 +22,7 @@ export class UserService {
     currentPage,
     pageSize,
     keyword,
+    roleId,
     createdAtStart,
     createdAtEnd,
   }: UserListQueryDto) {
@@ -36,29 +39,27 @@ export class UserService {
         { search: `%${search}%` },
       );
     }
+    if (roleId) {
+      query.innerJoin("user.roles", "filterRole", "filterRole.id = :roleId", { roleId });
+    }
     if (createdAtStart) {
       query.andWhere("user.createdAt >= :createdAtStart", { createdAtStart });
     }
     if (createdAtEnd) {
       query.andWhere("user.createdAt <= :createdAtEnd", { createdAtEnd });
     }
-    const [users, total] = await query
+    const [items, total] = await query
       .skip((currentPage - 1) * pageSize)
       .take(pageSize)
       .getManyAndCount();
-    return {
-      items: users,
-      total,
-      currentPage,
-      pageSize,
-    };
+    return { items, total };
   }
 
   // 查询当前用户
   async findCurrent(currentUser: AuthUser) {
     const user = await this.findOne(currentUser.userId);
     const { id: _profileId, ...profile } = user.profile;
-    return { ...profile, roles: user.roles };
+    return { ...profile, roles: user.roles.map(({ code }) => code) };
   }
   // 查询单个用户
   async findOne(id: number) {
@@ -70,10 +71,33 @@ export class UserService {
     return user;
   }
 
-  // 删除用户
+  // 更新用户及角色
+  async update(id: number, { realName, nickname, roleIds }: UpdateUserDto) {
+    return this.users.manager.transaction(async (manager) => {
+      const user = await manager.findOne(User, {
+        where: { id },
+        relations: { profile: true, roles: true },
+      });
+      if (!user) throw new NotFoundException("用户不存在");
+
+      if (realName !== undefined) user.profile.realName = realName;
+      if (nickname !== undefined) user.profile.nickname = nickname;
+      if (roleIds !== undefined) {
+        user.roles = await manager.findBy(Role, { id: In(roleIds) });
+        if (user.roles.length !== roleIds.length) throw new NotFoundException("角色不存在");
+      }
+      await manager.save(user);
+    });
+  }
+
+  // 删除用户并撤销其会话
   async remove(id: number) {
-    const user = await this.findOne(id);
-    await this.sessions.delete({ user: { id } });
-    await this.users.softRemove(user);
+    await this.sessions.manager.transaction(async (manager) => {
+      const users = manager.getRepository(User);
+      const user = await users.findOneBy({ id });
+      if (!user) throw new NotFoundException("用户不存在");
+      await manager.getRepository(AuthSession).delete({ user: { id } });
+      await users.softRemove(user);
+    });
   }
 }

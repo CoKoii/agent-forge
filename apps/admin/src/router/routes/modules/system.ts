@@ -19,15 +19,6 @@ const routes: RouteRecordRaw[] = [
           title: "用户管理",
         },
       },
-      {
-        name: "SystemRoles",
-        path: "roles",
-        component: () => import("#/views/system/roles/index.vue"),
-        meta: {
-          icon: "lucide:shield-check",
-          title: "角色管理",
-        },
-      },
     ],
   },
 ];
