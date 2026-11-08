@@ -1,7 +1,5 @@
 import type { Sortable } from "@vben-core/composables";
-import type { EmitType } from "@vben-core/typings";
-
-import type { TabsProps } from "./types";
+import type { TabsEmits, TabsProps } from "./types";
 
 import { nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 
@@ -13,7 +11,10 @@ function findParentElement(element: HTMLElement) {
   return element.classList.contains(parentCls) ? element : element.closest(`.${parentCls}`);
 }
 
-export function useTabsDrag(props: TabsProps, emit: EmitType) {
+export function useTabsDrag(
+  props: TabsProps,
+  emit: (evt: "sortTabs", ...args: TabsEmits["sortTabs"]) => void,
+) {
   const sortableInstance = ref<null | Sortable>(null);
 
   async function initTabsSortable() {

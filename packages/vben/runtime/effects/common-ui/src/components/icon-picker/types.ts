@@ -1,4 +1,4 @@
-import type { VNode } from "vue";
+import type { Component } from "vue";
 
 export interface IconPickerProps {
   pageSize?: number;
@@ -10,8 +10,8 @@ export interface IconPickerProps {
    * 图标列表
    */
   icons?: string[];
-  /** Input组件 */
-  inputComponent?: VNode;
+  /** Input 组件定义，通过动态组件和 v-model 渲染交互 */
+  inputComponent?: Component;
   /** 图标插槽名，预览图标将被渲染到此插槽中 */
   iconSlot?: string;
   /** input组件的值属性名称（如 antd 为 'value'、element 为 'model-value'）。组件自身的取值始终通过 v-model 交互 */

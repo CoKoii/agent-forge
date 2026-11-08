@@ -147,9 +147,7 @@ async function loadApplicationPlugins(options: ApplicationPluginOptions): Promis
     },
     {
       condition: vxeTableLazyImport,
-      plugins: async () => {
-        return [await viteVxeTableImportsPlugin()];
-      },
+      plugins: () => [viteVxeTableImportsPlugin()],
     },
     {
       condition: nitroMock,

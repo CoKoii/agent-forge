@@ -8,7 +8,8 @@ import { cn } from "@vben-core/shared/utils";
 import { reactiveOmit } from "@vueuse/core";
 import { SelectContent, SelectPortal, SelectViewport, useForwardPropsEmits } from "reka-ui";
 
-import { SelectScrollDownButton, SelectScrollUpButton } from ".";
+import SelectScrollDownButton from "./SelectScrollDownButton.vue";
+import SelectScrollUpButton from "./SelectScrollUpButton.vue";
 
 defineOptions({
   inheritAttrs: false,

@@ -57,7 +57,12 @@ export function downloadFileFromBase64({ fileName, source }: DownloadOptions) {
  */
 export async function downloadFileFromImageUrl({ fileName, source }: DownloadOptions) {
   const base64 = await urlToBase64(source);
-  downloadFileFromBase64({ fileName, source: base64 });
+  const extension = base64.slice(base64.indexOf("/") + 1, base64.indexOf(";")) || "png";
+  const derivedName = resolveFileName(source).replace(/\.[^.]*$/, "");
+  downloadFileFromBase64({
+    fileName: fileName || `${derivedName}.${extension}`,
+    source: base64,
+  });
 }
 
 /**
@@ -150,6 +155,9 @@ export function triggerDownload(
 function resolveFileName(url: string, fileName?: string): string {
   if (fileName) {
     return fileName;
+  }
+  if (url.startsWith("data:")) {
+    return DEFAULT_FILENAME;
   }
   // 查询串与锚点不属于文件名；签名链接普遍带 ?token=...
   const path = url.split("#")[0]?.split("?")[0] ?? "";

@@ -16,7 +16,11 @@ const { $t } = useSimpleLocale();
 const open = ref(false);
 
 const buttonClass = computed(() =>
-  cn("gap-1", props.action.danger && "text-destructive hover:text-destructive", props.action.class),
+  cn(
+    "gap-1 px-2 py-0",
+    props.action.danger && "text-destructive hover:text-destructive",
+    props.action.class,
+  ),
 );
 
 const variant = computed(() => props.action.variant ?? "link");
@@ -51,7 +55,6 @@ function onCancel() {
         :disabled="action.disabled"
         :loading="action.loading"
         :size="size"
-        class="p-2"
         :variant="variant"
       >
         <VbenIcon :icon="action.icon" v-if="action.icon" class="size-4" />
@@ -63,12 +66,12 @@ function onCancel() {
         {{ action.popConfirm.title ?? $t("confirmTitle") }}
       </div>
       <div class="flex justify-end gap-2">
-        <VbenButton size="default" variant="outline" @click="onCancel">
+        <VbenButton size="sm" variant="outline" @click="onCancel">
           {{ action.popConfirm.cancelText ?? $t("cancel") }}
         </VbenButton>
         <VbenButton
           :variant="action.danger ? 'destructive' : 'default'"
-          size="default"
+          size="sm"
           @click="onConfirm"
         >
           {{ action.popConfirm.okText ?? $t("confirm") }}
@@ -84,7 +87,6 @@ function onCancel() {
     :disabled="action.disabled"
     :loading="action.loading"
     :size="size"
-    class="p-2"
     :variant="variant"
     @click="onClick"
   >

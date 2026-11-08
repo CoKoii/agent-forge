@@ -1,7 +1,9 @@
 import type { Component } from "vue";
 import type { Router, RouteRecordRaw } from "vue-router";
 
-interface RouteMeta {
+import type { Recordable } from "./helper";
+
+interface VbenRouteMeta {
   /**
    * 激活图标（菜单/tab）
    */
@@ -119,7 +121,7 @@ interface RouteMeta {
   /**
    * 菜单所携带的参数
    */
-  query?: Recordable;
+  query?: Recordable<any>;
   /**
    * 标题名称
    */
@@ -147,7 +149,8 @@ interface GenerateMenuAndRoutesOptions {
 export type {
   ComponentRecordType,
   GenerateMenuAndRoutesOptions,
-  RouteMeta,
+  VbenRouteMeta as RouteMeta,
   RouteRecordRaw,
   RouteRecordStringComponent,
+  VbenRouteMeta,
 };

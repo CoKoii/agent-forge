@@ -1,11 +1,4 @@
-import type { RouteMeta as IRouteMeta } from "@vben-core/typings";
-
-import "vue-router";
-
-declare module "vue-router" {
-  // oxlint-disable-next-line typescript/no-empty-object-type
-  interface RouteMeta extends IRouteMeta {}
-}
+import "@vben-core/typings";
 
 export interface VbenAdminProAppConfigRaw {
   VITE_GLOB_API_URL: string;

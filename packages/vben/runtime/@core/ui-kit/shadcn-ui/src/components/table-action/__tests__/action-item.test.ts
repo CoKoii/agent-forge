@@ -35,9 +35,17 @@ async function openPopConfirm(action: Record<string, any>) {
 
   const content = document.body.querySelector('[data-slot="popover-content"]');
   expect(content).toBeTruthy();
-  const buttons = [...(content?.querySelectorAll("button") ?? [])];
+  if (!content) {
+    throw new Error("Expected popover content to exist");
+  }
+  const [cancelButton, confirmButton] = [...content.querySelectorAll("button")];
+  expect(cancelButton).toBeTruthy();
+  expect(confirmButton).toBeTruthy();
+  if (!cancelButton || !confirmButton) {
+    throw new Error("Expected cancel and confirm buttons to exist");
+  }
 
-  return { buttons, content };
+  return { cancelButton, confirmButton, content };
 }
 
 /** 提取与尺寸相关的类名，用于比较两个按钮的视觉大小是否一致 */
@@ -51,13 +59,12 @@ describe("action-item.vue popConfirm", () => {
   it("renders the default confirmation texts with the locale messages", async () => {
     setSimpleLocale("zh-CN");
 
-    const { buttons, content } = await openPopConfirm({
+    const { cancelButton, confirmButton, content } = await openPopConfirm({
       danger: true,
       popConfirm: {},
       text: "删除",
     });
 
-    const [cancelButton, confirmButton] = buttons;
     expect(content.textContent).toContain("请确认");
     expect(cancelButton.textContent?.trim()).toBe("取消");
     expect(confirmButton.textContent?.trim()).toBe("确认");
@@ -69,13 +76,12 @@ describe("action-item.vue popConfirm", () => {
   it("renders the default confirmation texts in english locale", async () => {
     setSimpleLocale("en-US");
 
-    const { buttons, content } = await openPopConfirm({
+    const { cancelButton, confirmButton, content } = await openPopConfirm({
       danger: true,
       popConfirm: {},
       text: "Delete",
     });
 
-    const [cancelButton, confirmButton] = buttons;
     expect(content.textContent).toContain("Please Confirm");
     expect(cancelButton.textContent?.trim()).toBe("Cancel");
     expect(confirmButton.textContent?.trim()).toBe("Confirm");
@@ -86,7 +92,7 @@ describe("action-item.vue popConfirm", () => {
   it("keeps the custom confirmation texts", async () => {
     setSimpleLocale("zh-CN");
 
-    const { buttons, content } = await openPopConfirm({
+    const { cancelButton, confirmButton, content } = await openPopConfirm({
       danger: true,
       popConfirm: {
         cancelText: "再想想",
@@ -96,7 +102,6 @@ describe("action-item.vue popConfirm", () => {
       text: "删除",
     });
 
-    const [cancelButton, confirmButton] = buttons;
     expect(content.textContent).toContain("确认删除?");
     expect(cancelButton.textContent?.trim()).toBe("再想想");
     expect(confirmButton.textContent?.trim()).toBe("删除吧");
@@ -105,14 +110,33 @@ describe("action-item.vue popConfirm", () => {
   it("renders the cancel and confirm buttons with the same size", async () => {
     setSimpleLocale("zh-CN");
 
-    const { buttons } = await openPopConfirm({
+    const { cancelButton, confirmButton, content } = await openPopConfirm({
       danger: true,
       popConfirm: {},
       text: "删除",
     });
 
-    expect(buttons).toHaveLength(2);
-    const [cancelButton, confirmButton] = buttons;
+    expect(content.querySelectorAll("button")).toHaveLength(2);
     expect(sizeClasses(cancelButton)).toEqual(sizeClasses(confirmButton));
+  });
+});
+
+describe("action-item.vue trigger button", () => {
+  it.each([
+    ["pop confirm", { popConfirm: {}, text: "删除" }],
+    ["plain", { text: "编辑" }],
+  ])("does not add vertical padding to the %s button", async (_, action) => {
+    const host = document.createElement("div");
+    document.body.append(host);
+
+    activeApp = createApp(() => h(ActionItem, { action }));
+    activeApp.mount(host);
+    await nextTick();
+
+    const button = host.querySelector("button");
+    expect(button).toBeTruthy();
+    expect(button?.classList).toContain("py-0");
+    expect(button?.classList).not.toContain("p-2");
+    expect(button?.classList).not.toContain("py-2");
   });
 });
