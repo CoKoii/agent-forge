@@ -10,7 +10,7 @@ export class PageQueryDto {
   @Type(() => Number)
   @IsInt({ message: "页码必须为整数" })
   @Min(1, { message: "页码最小为1" })
-  page = DEFAULT_PAGE;
+  currentPage = DEFAULT_PAGE;
 
   @IsOptional()
   @Type(() => Number)

@@ -10,7 +10,7 @@ import {
 } from "@nestjs/common";
 import { CurrentUser } from "../../../common/decorators/current-user.decorator";
 import type { AuthUser } from "../../../common/guards/jwt-auth.guard";
-import { PageQueryDto } from "../../../common/dto/page-query.dto";
+import { UserListQueryDto } from "./dto/user-list-query.dto";
 import { UserService } from "./user.service";
 
 // 用户控制器
@@ -26,7 +26,7 @@ export class UserController {
 
   // 查询用户列表
   @Get()
-  findAll(@Query() query: PageQueryDto) {
+  findAll(@Query() query: UserListQueryDto) {
     return this.users.findAll(query);
   }
 
