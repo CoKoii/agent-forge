@@ -47,6 +47,12 @@ export class RoleService {
   // 软删除角色
   async remove(id: number) {
     const role = await this.findOne(id);
+    const userCount = await this.roles
+      .createQueryBuilder("role")
+      .innerJoin("role.users", "user")
+      .where("role.id = :id", { id })
+      .getCount();
+    if (userCount) throw new ConflictException("该角色仍绑定用户，无法删除");
     await this.roles.softRemove(role);
   }
 

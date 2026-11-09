@@ -40,6 +40,10 @@ export function getUserListApi(params: UserListParams) {
   return requestClient.get("/user", { params });
 }
 
+export function getUserApi(id: number) {
+  return requestClient.get<UserListItem>(`/user/${id}`);
+}
+
 /** 更新用户资料和角色。 */
 export function updateUserApi(id: number, data: UpdateUserData) {
   return requestClient.request(`/user/${id}`, { method: "PATCH", data });

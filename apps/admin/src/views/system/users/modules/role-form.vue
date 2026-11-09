@@ -4,11 +4,12 @@ import { ref, watch } from "vue";
 import { message } from "antdv-next";
 import { useVbenModal } from "@vben/common-ui";
 
-import { createRoleApi } from "#/api/core/role";
+import { createRoleApi, updateRoleApi } from "#/api/core/role";
 import { useVbenForm } from "#/adapter/form";
 import { roleFormSchema } from "../config";
 
-const emit = defineEmits(["created"]);
+const emit = defineEmits(["saved"]);
+const editing = ref(false);
 const submitting = ref(false);
 const [Form, formApi] = useVbenForm<any>({
   commonConfig: { componentProps: { class: "w-full" } },
@@ -16,8 +17,7 @@ const [Form, formApi] = useVbenForm<any>({
   schema: roleFormSchema,
   showDefaultActions: false,
 });
-const [Modal, modalApi] = useVbenModal({
-  closeOnClickModal: false,
+const [Modal, modalApi] = useVbenModal<any>({
   confirmText: "确定",
   fullscreenButton: false,
   onBeforeClose: () => !submitting.value,
@@ -29,12 +29,10 @@ const [Modal, modalApi] = useVbenModal({
       const { valid } = await formApi.validate();
       if (!valid) return;
       const { code, name } = await formApi.getValues();
-      const role = await createRoleApi({ code, name });
-      message.success("角色创建成功");
-      emit("created", role);
-      formApi.reset();
-      submitting.value = false;
-      modalApi.unlock();
+      const role = modalApi.getData();
+      await (editing.value ? updateRoleApi(role.id, { name }) : createRoleApi({ code, name }));
+      message.success(`角色${editing.value ? "更新" : "创建"}成功`);
+      emit("saved");
       await modalApi.close();
     } catch {
       // The request interceptor reports API errors.
@@ -43,12 +41,17 @@ const [Modal, modalApi] = useVbenModal({
       modalApi.unlock();
     }
   },
-  title: "新增角色",
+  title: "角色",
 });
 
 const isOpen = modalApi.useStore((state) => state.isOpen);
 watch(isOpen, (open) => {
-  if (open) formApi.reset();
+  if (!open) return;
+  const role = modalApi.getData();
+  editing.value = Boolean(role);
+  formApi.updateSchema([{ componentProps: { disabled: editing.value, maxlength: 100 }, fieldName: "code" }]);
+  formApi.reset();
+  if (role) formApi.setValues(role);
 });
 </script>
 

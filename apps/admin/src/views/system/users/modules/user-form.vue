@@ -21,7 +21,6 @@ const [Form, formApi] = useVbenForm<any>(
   }),
 );
 const [Modal, modalApi] = useVbenModal<any>({
-  closeOnClickModal: false,
   confirmText: "保存",
   fullscreenButton: false,
   onBeforeClose: () => !submitting.value,
@@ -43,8 +42,6 @@ const [Modal, modalApi] = useVbenModal<any>({
       await updateUserApi(user.id, data);
       message.success("用户更新成功");
       emit("saved");
-      submitting.value = false;
-      modalApi.unlock();
       await modalApi.close();
     } catch {
       // The request interceptor reports API errors.

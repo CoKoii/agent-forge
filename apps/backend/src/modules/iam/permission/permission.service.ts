@@ -1,8 +1,6 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { PageQueryDto } from "../../../common/dto/page-query.dto";
-import { paginate } from "../../../common/utils/pagination";
 import { CreatePermissionDto, UpdatePermissionDto } from "./dto/permission.dto";
 import { Permission } from "./entities/permission.entity";
 
@@ -33,9 +31,8 @@ export class PermissionService {
     return [...new Set(permissions.map(({ code }) => code))];
   }
 
-  // 查询权限列表
-  findAll(query: PageQueryDto) {
-    return paginate(this.permissions, query, { order: { id: "DESC" } });
+  findAll() {
+    return this.permissions.find({ order: { code: "ASC" }, relations: { parent: true } });
   }
 
   // 查询单个权限
@@ -45,16 +42,32 @@ export class PermissionService {
     return permission;
   }
 
-  // 创建权限
-  create(data: CreatePermissionDto) {
-    return this.permissions.save(this.permissions.create(data));
+  async create(data: CreatePermissionDto) {
+    await this.validateParent(data.parentId);
+    const { parentId, ...permission } = data;
+    return this.permissions.save(this.permissions.create({ ...permission, parentId }));
   }
 
   // 更新权限
   async update(id: number, data: UpdatePermissionDto) {
     const permission = await this.findOne(id);
+    await this.validateParent(data.parentId, id);
     Object.assign(permission, data);
     return this.permissions.save(permission);
+  }
+
+  private async validateParent(parentId?: number | null, id?: number) {
+    if (parentId == null) return;
+    if (parentId === id) throw new ConflictException("权限不能设置自身为上级");
+    const visited = new Set<number>(id ? [id] : []);
+    let current = parentId;
+    while (current) {
+      if (visited.has(current)) throw new ConflictException("权限层级不能形成循环");
+      visited.add(current);
+      const parent = await this.permissions.findOne({ where: { id: current }, select: { id: true, parentId: true } });
+      if (!parent) throw new NotFoundException("上级权限不存在");
+      current = parent.parentId ?? 0;
+    }
   }
 
   // 软删除权限

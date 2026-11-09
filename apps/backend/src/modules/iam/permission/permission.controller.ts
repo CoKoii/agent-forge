@@ -9,9 +9,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
-  Query,
 } from "@nestjs/common";
-import { PageQueryDto } from "../../../common/dto/page-query.dto";
 import { CreatePermissionDto, UpdatePermissionDto } from "./dto/permission.dto";
 import { PermissionService } from "./permission.service";
 
@@ -22,8 +20,8 @@ export class PermissionController {
 
   // 查询权限列表
   @Get()
-  findAll(@Query() query: PageQueryDto) {
-    return this.permissions.findAll(query);
+  findAll() {
+    return this.permissions.findAll();
   }
 
   // 查询单个权限

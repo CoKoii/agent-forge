@@ -1,4 +1,4 @@
-import { IsOptional, IsString, Length } from "class-validator";
+import { IsInt, IsOptional, IsString, Length, Min } from "class-validator";
 
 export class CreatePermissionDto {
   @IsString()
@@ -13,6 +13,11 @@ export class CreatePermissionDto {
   @IsString()
   @Length(0, 255)
   description?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  parentId?: number | null;
 }
 
 export class UpdatePermissionDto {
@@ -30,4 +35,9 @@ export class UpdatePermissionDto {
   @IsString()
   @Length(0, 255)
   description?: string | null;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  parentId?: number | null;
 }

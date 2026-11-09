@@ -1,5 +1,4 @@
 import { getUserListApi } from "#/api/core/user";
-import { z } from "#/adapter/form";
 
 export const searchFormOptions: any = {
   schema: [
@@ -30,7 +29,7 @@ export function userFormSchema(roleOptions: any[]): any[] {
   return [
     {
       component: "Input",
-      componentProps: { disabled: true, maxlength: 50 },
+      componentProps: { readonly: true, maxlength: 50 },
       fieldName: "username",
       label: "账号",
     },
@@ -39,14 +38,12 @@ export function userFormSchema(roleOptions: any[]): any[] {
       componentProps: { maxlength: 50 },
       fieldName: "realName",
       label: "姓名",
-      rules: z.string().max(50, "姓名不能超过50个字符"),
     },
     {
       component: "Input",
       componentProps: { maxlength: 50 },
       fieldName: "nickname",
       label: "昵称",
-      rules: z.string().max(50, "昵称不能超过50个字符"),
     },
     {
       component: "Select",
@@ -70,14 +67,14 @@ export const roleFormSchema: any[] = [
     componentProps: { maxlength: 100 },
     fieldName: "code",
     label: "角色编码",
-    rules: z.string().min(1, "请输入角色编码").max(100, "角色编码不能超过100个字符"),
+    rules: "required",
   },
   {
     component: "Input",
     componentProps: { maxlength: 100 },
     fieldName: "name",
     label: "角色名称",
-    rules: z.string().min(1, "请输入角色名称").max(100, "角色名称不能超过100个字符"),
+    rules: "required",
   },
 ];
 
@@ -91,8 +88,7 @@ export function createGridOptions(getRoleId: () => number | undefined): any {
       {
         field: "roles",
         title: "角色",
-        formatter: ({ cellValue }: any) =>
-          (cellValue as any[] | undefined)?.map(({ name }) => name).join("、") ?? "",
+        slots: { default: "roles" },
       },
       { field: "createdAt", title: "创建时间", formatter: "formatDateTime" },
       { field: "actions", title: "操作", slots: { default: "actions" } },
