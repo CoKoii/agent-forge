@@ -6,6 +6,7 @@
   "type": "commonjs",
   "scripts": {
     "build": "nest build",
+    "db:init": "pnpm build && node dist/scripts/init.js",
     "deploy": "nest deploy",
     "dev": "nest start --watch",
     "start": "nest start",

@@ -21,6 +21,10 @@ export class PermissionService {
     return count === new Set(codes).size;
   }
 
+  async findAllCodes(): Promise<string[]> {
+    const permissions = await this.permissions.find({ select: { code: true }, order: { code: "ASC" } });
+    return permissions.map(({ code }) => code);
+  }
   // 查询用户权限编码
   async findCodesByUserId(userId: number): Promise<string[]> {
     const permissions = await this.permissions.find({

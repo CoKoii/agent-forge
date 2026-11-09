@@ -11,6 +11,9 @@ export class Role extends BaseEntity {
   @Column({ comment: "角色名称", length: 100 })
   name!: string;
 
+  @Column({ name: "is_super", comment: "是否超级管理员", default: false })
+  isSuper!: boolean;
+
   @ManyToMany(() => User, (user) => user.roles)
   users!: User[];
 

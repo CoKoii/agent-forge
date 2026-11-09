@@ -121,7 +121,9 @@ export class AuthService {
   }
 
   // 获取当前用户权限编码
-  getAccessCodes({ userId }: AuthUser) {
+  async getAccessCodes({ userId }: AuthUser) {
+    const user = await this.users.findOne({ where: { id: userId }, relations: { roles: true } });
+    if (user?.roles.some(({ isSuper }) => isSuper)) return this.permissions.findAllCodes();
     return this.permissions.findCodesByUserId(userId);
   }
 
