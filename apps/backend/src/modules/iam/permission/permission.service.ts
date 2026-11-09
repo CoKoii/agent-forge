@@ -22,7 +22,10 @@ export class PermissionService {
   }
 
   async findAllCodes(): Promise<string[]> {
-    const permissions = await this.permissions.find({ select: { code: true }, order: { code: "ASC" } });
+    const permissions = await this.permissions.find({
+      select: { code: true },
+      order: { code: "ASC" },
+    });
     return permissions.map(({ code }) => code);
   }
   // 查询用户权限编码
@@ -68,7 +71,10 @@ export class PermissionService {
     while (current) {
       if (visited.has(current)) throw new ConflictException("权限层级不能形成循环");
       visited.add(current);
-      const parent = await this.permissions.findOne({ where: { id: current }, select: { id: true, parentId: true } });
+      const parent = await this.permissions.findOne({
+        where: { id: current },
+        select: { id: true, parentId: true },
+      });
       if (!parent) throw new NotFoundException("上级权限不存在");
       current = parent.parentId ?? 0;
     }

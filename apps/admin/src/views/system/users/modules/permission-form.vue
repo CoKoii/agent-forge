@@ -3,25 +3,27 @@ import { ref, watch } from "vue";
 
 import { useVbenModal } from "@vben/common-ui";
 
-import { createPermissionApi, getPermissionListApi, type Permission, updatePermissionApi } from "#/api/core/permission";
+import {
+  createPermissionApi,
+  getPermissionListApi,
+  updatePermissionApi,
+} from "#/api/core/permission";
 import { useVbenForm } from "#/adapter/form";
 
 const editing = ref(false);
 const emit = defineEmits(["saved"]);
 
-type PermissionTreeNode = Permission & { children: PermissionTreeNode[]; title: string; value: number };
-
-function buildPermissionTree(items: Permission[]) {
-  const nodes = new Map<number, PermissionTreeNode>(
+function buildPermissionTree(items: any[]) {
+  const nodes = new Map(
     items.map((permission) => [
       permission.id,
       { ...permission, children: [], title: permission.name, value: permission.id },
     ]),
   );
-  const roots: PermissionTreeNode[] = [];
+  const roots: any[] = [];
 
   for (const permission of items) {
-    const node = nodes.get(permission.id)!;
+    const node: any = nodes.get(permission.id);
     const parent = permission.parentId == null ? undefined : nodes.get(permission.parentId);
     if (parent && parent.id !== node.id) parent.children.push(node);
     else roots.push(node);
@@ -30,14 +32,18 @@ function buildPermissionTree(items: Permission[]) {
   return roots;
 }
 
-function availableParents(items: Permission[], id?: number) {
+function availableParents(items: any[], id?: any) {
   if (!id) return items;
   const excluded = new Set([id]);
   let changed = true;
   while (changed) {
     changed = false;
     for (const permission of items) {
-      if (permission.parentId != null && excluded.has(permission.parentId) && !excluded.has(permission.id)) {
+      if (
+        permission.parentId != null &&
+        excluded.has(permission.parentId) &&
+        !excluded.has(permission.id)
+      ) {
         excluded.add(permission.id);
         changed = true;
       }
@@ -67,7 +73,7 @@ const [Modal, modalApi] = useVbenModal({
     const { valid } = await formApi.validate();
     if (!valid) return;
     const values = await formApi.getValues();
-    const permission = modalApi.getData() as Permission;
+    const permission = modalApi.getData();
     const saved = editing.value
       ? await updatePermissionApi(permission.id, values)
       : await createPermissionApi(values);
@@ -80,7 +86,7 @@ const [Modal, modalApi] = useVbenModal({
 const isOpen = modalApi.useStore((state) => state.isOpen);
 watch(isOpen, async (open) => {
   if (!open) return;
-  const permission = modalApi.getData() as Permission;
+  const permission = modalApi.getData();
   editing.value = Boolean(permission);
   formApi.updateSchema([{ componentProps: { disabled: editing.value }, fieldName: "code" }]);
   formApi.reset();
@@ -88,7 +94,11 @@ watch(isOpen, async (open) => {
   const permissions = await getPermissionListApi();
   formApi.updateSchema([
     {
-      componentProps: { allowClear: true, treeData: buildPermissionTree(availableParents(permissions, permission?.id)), treeDefaultExpandAll: true },
+      componentProps: {
+        allowClear: true,
+        treeData: buildPermissionTree(availableParents(permissions, permission?.id)),
+        treeDefaultExpandAll: true,
+      },
       fieldName: "parentId",
     },
   ]);

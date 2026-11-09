@@ -1,26 +1,19 @@
 import { requestClient } from "#/api/request";
 
-export interface Permission {
-  code: string;
-  id: number;
-  name: string;
-  parentId?: number | null;
-}
-
 export function getPermissionListApi() {
-  return requestClient.get<Permission[]>("/permissions");
+  return requestClient.get("/permissions");
 }
 
 export function getPermissionApi(id: number) {
-  return requestClient.get<Permission>(`/permissions/${id}`);
+  return requestClient.get(`/permissions/${id}`);
 }
 
-export function createPermissionApi(data: Omit<Permission, "id">) {
-  return requestClient.post<Permission>("/permissions", data);
+export function createPermissionApi(data: any) {
+  return requestClient.post("/permissions", data);
 }
 
-export function updatePermissionApi(id: number, data: Partial<Omit<Permission, "id">>) {
-  return requestClient.request<Permission>(`/permissions/${id}`, { method: "PATCH", data });
+export function updatePermissionApi(id: number, data: any) {
+  return requestClient.request(`/permissions/${id}`, { method: "PATCH", data });
 }
 
 export function deletePermissionApi(id: number) {

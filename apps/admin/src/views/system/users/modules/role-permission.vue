@@ -5,26 +5,27 @@ import { useVbenDrawer, useVbenModal } from "@vben/common-ui";
 import { IconifyIcon } from "@vben/icons";
 import { Button, Input, Popconfirm, Popover, Spin, Tree } from "antdv-next";
 
-import { deletePermissionApi, getPermissionApi, getPermissionListApi, type Permission } from "#/api/core/permission";
+import { deletePermissionApi, getPermissionApi, getPermissionListApi } from "#/api/core/permission";
 import { updateRoleApi } from "#/api/core/role";
 import PermissionForm from "./permission-form.vue";
 
 const role = ref<any>();
 const emit = defineEmits(["saved"]);
-const permissions = ref<Permission[]>([]);
+const permissions = ref<any[]>([]);
 const checkedIds = ref<number[]>([]);
 const loading = ref(false);
 const keyword = ref("");
 
-type PermissionTreeNode = Permission & { children: PermissionTreeNode[]; title: string };
-
-function buildPermissionTree(items: Permission[]) {
-  const nodes = new Map<number, PermissionTreeNode>(
-    items.map((permission) => [permission.id, { ...permission, children: [], title: permission.name }]),
+function buildPermissionTree(items: any[]) {
+  const nodes = new Map(
+    items.map((permission) => [
+      permission.id,
+      { ...permission, children: [], title: permission.name },
+    ]),
   );
-  const roots: PermissionTreeNode[] = [];
+  const roots: any[] = [];
   for (const permission of items) {
-    const node = nodes.get(permission.id)!;
+    const node: any = nodes.get(permission.id);
     const parent = permission.parentId == null ? undefined : nodes.get(permission.parentId);
     if (parent && parent.id !== node.id) parent.children.push(node);
     else roots.push(node);
@@ -39,7 +40,7 @@ const permissionTree = computed(() => {
   const includedIds = new Set<number>();
   for (const permission of permissions.value) {
     if (!`${permission.code} ${permission.name}`.toLowerCase().includes(value)) continue;
-    let current: Permission | undefined = permission;
+    let current: any = permission;
     while (current && !includedIds.has(current.id)) {
       includedIds.add(current.id);
       current = current.parentId == null ? undefined : byId.get(current.parentId);
@@ -49,10 +50,11 @@ const permissionTree = computed(() => {
 });
 const expandedKeys = computed(() => {
   const keys: number[] = [];
-  const visit = (nodes: PermissionTreeNode[]) => nodes.forEach((node) => {
-    keys.push(node.id);
-    visit(node.children);
-  });
+  const visit = (nodes: any[]) =>
+    nodes.forEach((node) => {
+      keys.push(node.id);
+      visit(node.children);
+    });
   visit(permissionTree.value);
   return keys;
 });
@@ -63,7 +65,7 @@ async function load() {
   loading.value = true;
   try {
     permissions.value = await getPermissionListApi();
-    checkedIds.value = role.value?.permissions?.map(({ id }: Permission) => id) ?? [];
+    checkedIds.value = role.value?.permissions?.map(({ id }: any) => id) ?? [];
   } finally {
     loading.value = false;
   }
@@ -90,17 +92,17 @@ function togglePermission(id: number) {
     : [...checkedIds.value, id];
 }
 
-async function editPermission(permission: Permission) {
+async function editPermission(permission: any) {
   permissionModalApi.setData(await getPermissionApi(permission.id)).open();
 }
 
-async function deletePermission(permission: Permission) {
+async function deletePermission(permission: any) {
   await deletePermissionApi(permission.id);
   permissions.value = permissions.value.filter(({ id }) => id !== permission.id);
   checkedIds.value = checkedIds.value.filter((id) => id !== permission.id);
 }
 
-function addPermission(permission: Permission) {
+function addPermission(permission: any) {
   const index = permissions.value.findIndex(({ id }) => id === permission.id);
   if (index < 0) {
     permissions.value = [permission, ...permissions.value];
@@ -130,7 +132,10 @@ function createPermission() {
         default-expand-all
       >
         <template #titleRender="node">
-          <span class="flex w-full min-w-0 items-center gap-2" @click.stop="togglePermission(node.id)">
+          <span
+            class="flex w-full min-w-0 items-center gap-2"
+            @click.stop="togglePermission(node.id)"
+          >
             <span class="min-w-0 flex-1 truncate">{{ node.name }}</span>
             <Popover placement="rightTop" trigger="click" @click.stop>
               <Button aria-label="更多" size="small" type="text">

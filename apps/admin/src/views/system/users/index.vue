@@ -15,8 +15,18 @@ import UserForm from "./modules/user-form.vue";
 
 const roleOptions = ref<any[]>([]);
 const openRoleMenuId = ref<number>();
-const TAG_COLORS = ["#1677ff", "#13c2c2", "#52c41a", "#faad14", "#fa541c", "#eb2f96", "#722ed1", "#2f54eb"];
-const roleTagColor = (name: string) => [...name].reduce((hash, char) => (hash * 31 + char.codePointAt(0)!) >>> 0, 0) % TAG_COLORS.length;
+const TAG_COLORS = [
+  "#1677ff",
+  "#13c2c2",
+  "#52c41a",
+  "#faad14",
+  "#fa541c",
+  "#eb2f96",
+  "#722ed1",
+  "#2f54eb",
+];
+const roleTagColor = (name: string) =>
+  [...name].reduce((hash, char) => (hash * 31 + char.codePointAt(0)!) >>> 0, 0) % TAG_COLORS.length;
 
 const selectedRoleId = ref<number>();
 const roleTreeKeyword = ref("");
@@ -111,7 +121,11 @@ onMounted(loadRoleOptions);
             class="w-0 min-w-0 flex-1"
             placeholder="搜索角色名称"
           />
-          <Button class="shrink-0 whitespace-nowrap" type="primary" @click="roleModalApi.setData(null).open()">
+          <Button
+            class="shrink-0 whitespace-nowrap"
+            type="primary"
+            @click="roleModalApi.setData(null).open()"
+          >
             新增
           </Button>
         </div>

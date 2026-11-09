@@ -49,7 +49,9 @@ watch(isOpen, (open) => {
   if (!open) return;
   const role = modalApi.getData();
   editing.value = Boolean(role);
-  formApi.updateSchema([{ componentProps: { disabled: editing.value, maxlength: 100 }, fieldName: "code" }]);
+  formApi.updateSchema([
+    { componentProps: { disabled: editing.value, maxlength: 100 }, fieldName: "code" },
+  ]);
   formApi.reset();
   if (role) formApi.setValues(role);
 });
