@@ -5,12 +5,13 @@
   "type": "module",
   "scripts": {
     "check": "vp check",
-    "test": "vp test run",
-    "build": "pnpm --recursive --if-present run build",
+    "test": "vp test run --dir packages/utils && pnpm --filter @vben/admin run test && vp test run --root packages/vben --config ../../apps/admin/vitest.config.ts",
+    "build": "pnpm --filter @vben/admin run build",
     "ready": "pnpm run check && pnpm run test && pnpm run build",
-    "dev": "vp run --parallel --filter website --filter backend dev"
+    "dev": "pnpm --parallel --filter website --filter backend --filter @vben/admin run dev"
   },
   "devDependencies": {
+    "@vben/tsconfig": "workspace:*",
     "vite-plus": "catalog:"
   },
   "devEngines": {

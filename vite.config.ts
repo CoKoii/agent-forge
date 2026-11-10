@@ -1,7 +1,6 @@
 import { defineConfig } from "vite-plus";
 
 export default defineConfig({
-  fmt: {},
   lint: {
     jsPlugins: [{ name: "vite-plus", specifier: "vite-plus/oxlint-plugin" }],
     rules: { "vite-plus/prefer-vite-plus-imports": "error" },
@@ -15,9 +14,9 @@ export default defineConfig({
         },
       },
     ],
-    options: { typeAware: true, typeCheck: true },
   },
   test: {
+    exclude: ["**/node_modules/**", "node_modules/**"],
     globals: true,
     include: ["**/*.test.ts", "**/*.spec.ts", "**/*.e2e-spec.ts"],
   },

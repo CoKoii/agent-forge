@@ -1,0 +1,37 @@
+{
+  "name": "@vben-core/form-ui",
+  "version": "5.8.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "development": "./src/index.ts",
+      "production": "./src/index.ts",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "dependencies": {
+    "@tanstack/store": "catalog:vben",
+    "@tanstack/vue-form": "catalog:vben",
+    "@vben-core/composables": "workspace:*",
+    "@vben-core/icons": "workspace:*",
+    "@vben-core/shadcn-ui": "workspace:*",
+    "@vben-core/shared": "workspace:*",
+    "@vben-core/typings": "workspace:*",
+    "@vueuse/core": "catalog:vben",
+    "vue": "catalog:vben",
+    "zod": "catalog:vben",
+    "zod-defaults": "catalog:vben"
+  },
+  "devDependencies": {
+    "@vue/test-utils": "catalog:vben",
+    "unplugin-vue": "catalog:vben"
+  }
+}

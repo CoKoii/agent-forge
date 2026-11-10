@@ -1,0 +1,27 @@
+{
+  "name": "@vben/stores",
+  "version": "5.8.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "dependencies": {
+    "@vben-core/preferences": "workspace:*",
+    "@vben-core/shared": "workspace:*",
+    "@vben-core/typings": "workspace:*",
+    "pinia-plugin-persistedstate": "catalog:vben",
+    "secure-ls": "catalog:vben"
+  },
+  "peerDependencies": {
+    "pinia": "catalog:vben",
+    "vue": "catalog:vben",
+    "vue-router": "catalog:vben"
+  }
+}

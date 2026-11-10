@@ -1,13 +1,17 @@
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 import { AppModule } from "./app.module";
 import { ObserveInstrument } from "./infrastructure/observe/observe.module";
-import { FastifyAdapter, type NestFastifyApplication } from "@nestjs/platform-fastify";
 import { HttpAdapterHost, NestFactory } from "@nestjs/core";
 import { ConfigService } from "@nestjs/config";
 import { BadRequestException, ValidationPipe, VersioningType } from "@nestjs/common";
 import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
+import { ResponseInterceptor } from "./common/interceptors/response.interceptor";
+import { NodeAdapter, type NestNodeApplication } from "@nestjs/platform-node";
+import cookieParser from "cookie-parser";
+import { requestIdMiddleware } from "./common/middleware/request-id.middleware";
+
 async function bootstrap() {
-  const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter(), {
+  const app = await NestFactory.create<NestNodeApplication>(AppModule, new NodeAdapter(), {
     // Observe 追踪配置(https://www.observe.nestjs.com)
     instrument: ObserveInstrument,
     // 启动日志缓冲配置
@@ -15,12 +19,19 @@ async function bootstrap() {
   });
   const configService = app.get(ConfigService);
 
+  // 生成请求 ID
+  app.use(requestIdMiddleware);
+
   // 全局异常过滤器配置
   app.useGlobalFilters(new HttpExceptionFilter(app.get(HttpAdapterHost)));
+
+  // 全局响应拦截器配置
+  app.useGlobalInterceptors(new ResponseInterceptor());
 
   // 全局验证管道配置
   app.useGlobalPipes(
     new ValidationPipe({
+      transform: true,
       whitelist: true,
       forbidNonWhitelisted: true,
       exceptionFactory: (errors) => {
@@ -39,9 +50,12 @@ async function bootstrap() {
   app.enableShutdownHooks();
 
   // CORS 配置
-  const corsOrigin = configService.getOrThrow<string>("CORS_ORIGIN");
   app.enableCors({
-    origin: corsOrigin === "*" ? true : corsOrigin.split(",").map((o) => o.trim()),
+    origin: configService
+      .getOrThrow<string>("CORS_ORIGIN")
+      .split(",")
+      .map((origin) => origin.trim()),
+    credentials: true,
   });
 
   // 全局路由前缀配置
@@ -52,6 +66,9 @@ async function bootstrap() {
     type: VersioningType.URI,
     defaultVersion: "1",
   });
+
+  // cookie 配置
+  app.use(cookieParser());
 
   // 端口配置
   const port = configService.getOrThrow<number>("PORT");

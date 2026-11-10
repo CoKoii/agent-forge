@@ -1,0 +1,27 @@
+{
+  "name": "@vben/tailwind-config",
+  "version": "5.8.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./theme": {
+      "default": "./src/theme.css"
+    }
+  },
+  "dependencies": {
+    "@iconify/tailwind4": "catalog:vben",
+    "@tailwindcss/typography": "catalog:vben",
+    "tailwindcss": "catalog:vben",
+    "tw-animate-css": "catalog:vben"
+  }
+}

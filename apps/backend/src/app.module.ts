@@ -2,13 +2,15 @@ import { Module } from "@nestjs/common";
 import { APP_GUARD } from "@nestjs/core";
 import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { AuthModule } from "./modules/iam/auth/auth.module";
+import { UserModule } from "./modules/iam/user/user.module";
+import { ProfileModule } from "./modules/iam/profile/profile.module";
+import { PermissionModule } from "./modules/iam/permission/permission.module";
+import { RoleModule } from "./modules/iam/role/role.module";
 import { HealthModule } from "./modules/health/health.module";
 import { ObserveInfrastructureModule } from "./infrastructure/observe/observe.module";
 import { LoggerModule } from "./infrastructure/logger/logger.module";
 import { DatabaseModule } from "./infrastructure/database/database.module";
 import { AppConfigModule } from "./config/config.module";
-import { ProfileModule } from "./modules/iam/profile/profile.module";
-import { UserModule } from "./modules/iam/user/user.module";
 
 @Module({
   imports: [
@@ -18,9 +20,11 @@ import { UserModule } from "./modules/iam/user/user.module";
     ObserveInfrastructureModule,
     DatabaseModule,
     AuthModule,
-    HealthModule,
-    ProfileModule,
     UserModule,
+    ProfileModule,
+    PermissionModule,
+    RoleModule,
+    HealthModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

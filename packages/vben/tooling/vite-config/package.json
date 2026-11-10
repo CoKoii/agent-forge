@@ -1,0 +1,50 @@
+{
+  "name": "@vben/vite-config",
+  "version": "5.8.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "build": "pnpm exec tsdown"
+  },
+  "dependencies": {
+    "@intlify/unplugin-vue-i18n": "catalog:vben",
+    "@jspm/generator": "catalog:vben",
+    "@tailwindcss/vite": "catalog:vben",
+    "@vben/node-utils": "workspace:*",
+    "archiver": "catalog:vben",
+    "cheerio": "catalog:vben",
+    "get-port": "catalog:vben",
+    "html-minifier-terser": "catalog:vben",
+    "nitropack": "catalog:vben",
+    "resolve.exports": "catalog:vben",
+    "vite-plugin-pwa": "catalog:vben",
+    "vite-plugin-vue-devtools": "catalog:vben"
+  },
+  "devDependencies": {
+    "@pnpm/workspace.read-manifest": "catalog:vben",
+    "@types/archiver": "catalog:vben",
+    "@types/html-minifier-terser": "catalog:vben",
+    "@types/node": "catalog:vben",
+    "@vitejs/plugin-vue": "catalog:vben",
+    "@vitejs/plugin-vue-jsx": "catalog:vben",
+    "dayjs": "catalog:vben",
+    "dotenv": "catalog:vben",
+    "rollup-plugin-visualizer": "catalog:vben",
+    "sass": "catalog:vben",
+    "sass-embedded": "catalog:vben",
+    "tsdown": "catalog:vben",
+    "unplugin-dts": "catalog:vben",
+    "vite": "catalog:vben",
+    "vite-plugin-compression": "catalog:vben",
+    "vite-plugin-lazy-import": "catalog:vben"
+  }
+}

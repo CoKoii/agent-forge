@@ -1,0 +1,64 @@
+{
+  "name": "@vben/plugins",
+  "version": "5.8.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./echarts": {
+      "types": "./src/echarts/index.ts",
+      "default": "./src/echarts/index.ts"
+    },
+    "./tiptap": {
+      "types": "./src/tiptap/index.ts",
+      "default": "./src/tiptap/index.ts"
+    },
+    "./vxe-table": {
+      "types": "./src/vxe-table/index.ts",
+      "default": "./src/vxe-table/index.ts"
+    },
+    "./motion": {
+      "types": "./src/motion/index.ts",
+      "default": "./src/motion/index.ts"
+    }
+  },
+  "dependencies": {
+    "@tiptap/core": "catalog:vben",
+    "@tiptap/extension-document": "catalog:vben",
+    "@tiptap/extension-highlight": "catalog:vben",
+    "@tiptap/extension-image": "catalog:vben",
+    "@tiptap/extension-link": "catalog:vben",
+    "@tiptap/extension-placeholder": "catalog:vben",
+    "@tiptap/extension-text-align": "catalog:vben",
+    "@tiptap/extension-text-style": "catalog:vben",
+    "@tiptap/extension-underline": "catalog:vben",
+    "@tiptap/pm": "catalog:vben",
+    "@tiptap/starter-kit": "catalog:vben",
+    "@tiptap/vue-3": "catalog:vben",
+    "@vben-core/design": "workspace:*",
+    "@vben-core/form-ui": "workspace:*",
+    "@vben-core/popup-ui": "workspace:*",
+    "@vben-core/shadcn-ui": "workspace:*",
+    "@vben-core/shared": "workspace:*",
+    "@vben-core/typings": "workspace:*",
+    "@vben/hooks": "workspace:*",
+    "@vben/icons": "workspace:*",
+    "@vben/locales": "workspace:*",
+    "@vben/preferences": "workspace:*",
+    "@vben/types": "workspace:*",
+    "@vben/utils": "workspace:*",
+    "@vueuse/core": "catalog:vben",
+    "@vueuse/motion": "catalog:vben",
+    "@vxe-ui/core": "catalog:vben",
+    "echarts": "catalog:vben",
+    "vue": "catalog:vben",
+    "vxe-pc-ui": "catalog:vben",
+    "vxe-table": "catalog:vben"
+  }
+}

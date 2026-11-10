@@ -1,0 +1,28 @@
+{
+  "name": "@vben/hooks",
+  "version": "5.8.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "dependencies": {
+    "@vben-core/composables": "workspace:*",
+    "@vben/preferences": "workspace:*",
+    "@vben/stores": "workspace:*",
+    "@vben/types": "workspace:*",
+    "@vben/utils": "workspace:*",
+    "@vueuse/core": "catalog:vben",
+    "watermark-js-plus": "catalog:vben"
+  },
+  "peerDependencies": {
+    "vue": "catalog:vben",
+    "vue-router": "catalog:vben"
+  }
+}

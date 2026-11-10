@@ -1,26 +1,40 @@
-import { Injectable } from "@nestjs/common";
-import { CreateProfileDto } from "./dto/create-profile.dto";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
+import { Profile } from "./entities/profile.entity";
+import type { AuthUser } from "../../../common/guards/jwt-auth.guard";
 
+// 个人资料服务
 @Injectable()
 export class ProfileService {
-  create(createProfileDto: CreateProfileDto) {
-    return "This action adds a new profile";
+  // 服务依赖配置
+  constructor(@InjectRepository(Profile) private readonly profiles: Repository<Profile>) {}
+
+  // 查询当前资料
+  async getCurrentProfile({ userId }: AuthUser) {
+    const profile = await this.profiles.findOne({
+      where: { user: { id: userId } },
+    });
+
+    if (!profile) throw new NotFoundException("个人资料不存在");
+    return profile;
   }
 
-  findAll() {
-    return `This action returns all profile`;
-  }
+  // 更新当前资料
+  async updateCurrentProfile({ userId }: AuthUser, updateDto: UpdateProfileDto) {
+    if (!Object.keys(updateDto).length) {
+      throw new BadRequestException("至少提供一个资料字段");
+    }
 
-  findOne(id: number) {
-    return `This action returns a #${id} profile`;
-  }
+    const profile = await this.profiles.findOne({
+      where: { user: { id: userId } },
+    });
 
-  update(id: number, updateProfileDto: UpdateProfileDto) {
-    return `This action updates a #${id} profile`;
-  }
+    if (!profile) throw new NotFoundException("个人资料不存在");
 
-  remove(id: number) {
-    return `This action removes a #${id} profile`;
+    Object.assign(profile, updateDto);
+    await this.profiles.save(profile);
+    return profile;
   }
 }

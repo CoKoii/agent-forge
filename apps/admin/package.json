@@ -1,0 +1,53 @@
+{
+  "name": "@vben/admin",
+  "version": "5.8.0",
+  "private": true,
+  "type": "module",
+  "imports": {
+    "#/*": "./src/*"
+  },
+  "scripts": {
+    "build": "vp build --mode production",
+    "dev": "vp dev --mode development",
+    "prebuild": "pnpm --filter @vben/node-utils run build && pnpm --filter @vben/vite-config run build",
+    "predev": "pnpm --filter @vben/node-utils run build && pnpm --filter @vben/vite-config run build",
+    "preview": "vp preview",
+    "typecheck": "vue-tsc --noEmit --skipLibCheck",
+    "test": "vp test run --config vitest.config.ts"
+  },
+  "dependencies": {
+    "@vben/access": "workspace:*",
+    "@vben/common-ui": "workspace:*",
+    "@vben/constants": "workspace:*",
+    "@vben/hooks": "workspace:*",
+    "@vben/icons": "workspace:*",
+    "@vben/layouts": "workspace:*",
+    "@vben/locales": "workspace:*",
+    "@vben/plugins": "workspace:*",
+    "@vben/preferences": "workspace:*",
+    "@vben/request": "workspace:*",
+    "@vben/stores": "workspace:*",
+    "@vben/styles": "workspace:*",
+    "@vben/types": "workspace:*",
+    "@vben/utils": "workspace:*",
+    "@vueuse/core": "catalog:vben",
+    "antdv-next": "catalog:vben",
+    "dayjs": "catalog:vben",
+    "pinia": "catalog:vben",
+    "vue": "catalog:vben",
+    "vue-router": "catalog:vben"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:vben",
+    "@vben/tailwind-config": "workspace:*",
+    "@vben/tsconfig": "workspace:*",
+    "@vben/vite-config": "workspace:*",
+    "@vitejs/plugin-vue": "catalog:vben",
+    "@vitejs/plugin-vue-jsx": "catalog:vben",
+    "typescript": "catalog:vben",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:vben",
+    "vue-tsc": "catalog:vben"
+  }
+}

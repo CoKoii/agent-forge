@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { AuditSubscriber } from "../../common/subscribers/audit.subscriber";
 
 @Module({
   imports: [
@@ -14,6 +15,9 @@ import { TypeOrmModule } from "@nestjs/typeorm";
         password: cs.getOrThrow("DB_PASSWORD"),
         database: cs.getOrThrow("DB_DATABASE"),
         autoLoadEntities: true,
+        subscribers: [AuditSubscriber],
+        migrations: [__dirname + "/migrations/*{.js,.ts}"],
+        migrationsRun: cs.get("NODE_ENV") === "production",
         synchronize: cs.get("NODE_ENV") === "development",
         logging: cs.get("NODE_ENV") === "development",
         extra: { max: cs.getOrThrow<number>("DB_POOL_MAX") },

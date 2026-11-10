@@ -1,0 +1,26 @@
+import Vue from "@vitejs/plugin-vue";
+import VueJsx from "@vitejs/plugin-vue-jsx";
+import { configDefaults, defineConfig } from "vite-plus";
+
+export default defineConfig({
+  plugins: [Vue(), VueJsx()],
+  test: {
+    environment: "happy-dom",
+    environmentOptions: {
+      happyDOM: {
+        settings: {
+          handleDisabledFileLoadingAsSuccess: true,
+        },
+      },
+    },
+    exclude: [
+      ...configDefaults.exclude,
+      "**/e2e/**",
+      "**/dist/**",
+      "**/.{idea,git,cache,output,temp}/**",
+      "**/node_modules/**",
+      "**/{stylelint,eslint}.config.*",
+      "**/{oxfmt,oxlint}.config.*",
+    ],
+  },
+});

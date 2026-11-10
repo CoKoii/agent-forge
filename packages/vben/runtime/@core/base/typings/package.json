@@ -1,0 +1,24 @@
+{
+  "name": "@vben-core/typings",
+  "version": "5.8.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "development": "./src/index.ts",
+      "production": "./src/index.ts",
+      "default": "./dist/index.mjs"
+    },
+    "./vue-router": {
+      "types": "./vue-router.d.ts"
+    }
+  },
+  "peerDependencies": {
+    "vue": "catalog:vben",
+    "vue-router": "catalog:vben"
+  }
+}
