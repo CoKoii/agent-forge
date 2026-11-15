@@ -6,9 +6,8 @@
   "scripts": {
     "prepare": "vp config --no-agent",
     "check": "vp check",
-    "test": "vp test run --dir packages/utils",
-    "build": "pnpm --parallel --filter website --filter backend --filter utils run build",
-    "ready": "pnpm run check && pnpm run test && pnpm run build",
+    "build": "pnpm --parallel --filter website --filter backend run build",
+    "ready": "pnpm run check && pnpm run build",
     "dev": "pnpm --parallel --filter website --filter backend run dev"
   },
   "devDependencies": {
