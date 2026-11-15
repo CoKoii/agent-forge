@@ -5,15 +5,15 @@ import { format, transports } from "winston";
 
 @Module({
   imports: [
-    // 全局日志：winston 控制台
+    // 全局日志配置
     WinstonModule.forRootAsync({
-      // 注入 ConfigService 以便读取日志相关配置
+      // 注入配置服务
       inject: [ConfigService],
-      // 创建日志配置
+      // 日志配置
       useFactory: (configService: ConfigService) => {
         return {
           transports: [
-            // 控制台：按 Nest 风格输出，便于开发调试
+            // 控制台输出
             new transports.Console({
               level: configService.getOrThrow<string>("LOG_LEVEL"),
               format: format.combine(
