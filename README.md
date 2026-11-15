@@ -266,12 +266,6 @@ agent-forge/
 │           │   ├── database/
 │           │   ├── logger/
 │           │   └── observe/
-│           └── modules/
-│               ├── health/
-│               └── iam/
-│                   ├── auth/
-│                   ├── profile/
-│                   └── user/
 │
 ├── packages/                # 可复用内部包
 ├── tools/                   # 工程工具
@@ -322,26 +316,25 @@ pnpm install
 
 ### 3. 配置环境变量
 
-后端通过 Joi 校验运行环境配置。以下是根据当前配置定义整理的示例，实际使用时请替换为自己的数据库信息。
+后端启动时会连接 PostgreSQL。请在仓库根目录创建 `.env` 并填写数据库连接信息：
 
 ```dotenv
 NODE_ENV=development
 PORT=3000
 LOG_LEVEL=info
-CORS_ORIGIN=*
+CORS_ORIGIN=http://localhost:5173
 
-DB_HOST=localhost
+DB_HOST=127.0.0.1
 DB_PORT=5432
-DB_USERNAME=postgres
-DB_PASSWORD=your_password
+DB_USERNAME=agent_forge
+DB_PASSWORD=replace-with-local-password
 DB_DATABASE=agent_forge
 DB_POOL_MAX=10
-
-OBSERVE_APP_KEY=
-OBSERVE_APP_SECRET=
 ```
 
-将配置保存到仓库根目录的 `.env` 文件中。
+`deploy/compose.yaml` 将本机 `127.0.0.1:5433` 映射到 PostgreSQL 容器的 `5432` 端口。将根目录 `.env.example` 复制为 `.env` 并设置密码后，可在仓库根目录执行 `docker compose -f deploy/compose.yaml up -d` 启动数据库。
+
+数据库基础设施和迁移历史保留；当前业务接口模块已移除，后续可在保留数据库能力的基础上重写。
 
 ### 4. 启动开发环境
 
@@ -409,15 +402,15 @@ Agent Forge 正在持续开发中。
 
 - pnpm + Vite Plus Monorepo 工程结构。
 - NestJS + Fastify 后端基础工程。
-- PostgreSQL / TypeORM 数据访问基础设施。
-- 配置校验、日志、限流及基础模块组织。
+- PostgreSQL / TypeORM 数据库连接、迁移历史与数据库基础设施。
+- 配置校验、日志、限流及 NestJS 服务启动基础。
 - 六类 Agent 的角色 Skill 与协作规范。
 - 需求、架构、测试和审查文档管理约定。
 
 以下部分仍在持续完善：
 
 - 前端应用目前仍以初始模板为基础。
-- 后端业务模块和认证流程仍需继续完善。
+- 后端当前仅保留 NestJS 启动基础，业务模块与认证流程尚未实现。
 - Agent 角色规范与实际运行时的调度、任务状态管理能力，需要结合具体 Agent 宿主环境使用和验证。
 - 自动化研发流程、团队可视化与更完整的交付闭环仍有进一步建设空间。
 
@@ -434,7 +427,7 @@ Agent Forge 正在持续开发中。
 - [x] 需求追踪与团队文档组织规范
 - [x] 测试与代码审查工作规范
 - [ ] 完善前端应用
-- [ ] 完善用户认证与权限体系
+- [ ] 建设后端业务模块与用户认证、权限体系
 - [ ] 统一 Agent 任务状态与交付协议
 - [ ] 深化多 Agent 自动调度与协作
 - [ ] 完善需求、代码、测试之间的自动化追踪

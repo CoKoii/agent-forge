@@ -8,17 +8,9 @@ export default defineConfig({
       {
         files: ["apps/backend/**"],
         env: { node: true },
-        rules: {
-          "typescript/no-explicit-any": "off",
-          "typescript/no-floating-promises": "error",
-        },
+        rules: { "typescript/no-floating-promises": "error" },
       },
     ],
-  },
-  test: {
-    exclude: ["**/node_modules/**", "node_modules/**"],
-    globals: true,
-    include: ["**/*.test.ts", "**/*.spec.ts", "**/*.e2e-spec.ts"],
   },
   run: {
     cache: true,

@@ -4,14 +4,14 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "prepare": "vp config --no-agent",
     "check": "vp check",
-    "test": "vp test run --dir packages/utils && pnpm --filter @vben/admin run test && vp test run --root packages/vben --config ../../apps/admin/vitest.config.ts",
-    "build": "pnpm --filter @vben/admin run build",
+    "test": "vp test run --dir packages/utils",
+    "build": "pnpm --parallel --filter website --filter backend --filter utils run build",
     "ready": "pnpm run check && pnpm run test && pnpm run build",
-    "dev": "pnpm --parallel --filter website --filter backend --filter @vben/admin run dev"
+    "dev": "pnpm --parallel --filter website --filter backend run dev"
   },
   "devDependencies": {
-    "@vben/tsconfig": "workspace:*",
     "vite-plus": "catalog:"
   },
   "devEngines": {

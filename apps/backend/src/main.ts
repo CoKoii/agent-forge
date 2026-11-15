@@ -1,6 +1,5 @@
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 import { AppModule } from "./app.module";
-import { ObserveInstrument } from "./infrastructure/observe/observe.module";
 import { HttpAdapterHost, NestFactory } from "@nestjs/core";
 import { ConfigService } from "@nestjs/config";
 import { BadRequestException, ValidationPipe, VersioningType } from "@nestjs/common";
@@ -12,8 +11,6 @@ import { requestIdMiddleware } from "./common/middleware/request-id.middleware";
 
 async function bootstrap() {
   const app = await NestFactory.create<NestNodeApplication>(AppModule, new NodeAdapter(), {
-    // Observe 追踪配置(https://www.observe.nestjs.com)
-    instrument: ObserveInstrument,
     // 启动日志缓冲配置
     bufferLogs: true,
   });
