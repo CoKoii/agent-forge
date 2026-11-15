@@ -3,19 +3,19 @@ import joi from "joi";
 export const envValidationSchema = joi.object({
   // =========================基础服务配置=========================
   // 生产环境/开发环境
-  NODE_ENV: joi.string().default("development"),
+  NODE_ENV: joi.string().required(),
 
   // 端口
-  PORT: joi.number().port().default(3000),
+  PORT: joi.number().port().required(),
 
   // 日志等级
-  LOG_LEVEL: joi.string().default("info"),
+  LOG_LEVEL: joi.string().required(),
 
   // CORS 跨域
   CORS_ORIGIN: joi
     .string()
     .min(1)
-    .default("http://localhost:5173")
+    .required()
     .custom((value: string, helpers) =>
       value.split(",").some((origin) => origin.trim() === "*")
         ? helpers.error("any.invalid")
