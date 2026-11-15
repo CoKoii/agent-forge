@@ -4,6 +4,7 @@ import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { LoggerModule } from "./infrastructure/logger/logger.module";
 import { DatabaseModule } from "./infrastructure/database/database.module";
 import { AppConfigModule } from "./config/config.module";
+import { UserModule } from "./modules/iam/user/user.module";
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { AppConfigModule } from "./config/config.module";
     AppConfigModule,
     LoggerModule,
     DatabaseModule,
+    UserModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
