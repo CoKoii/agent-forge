@@ -7,6 +7,7 @@ import { AppConfigModule } from "./config/config.module";
 import { UserModule } from "./modules/iam/user/user.module";
 import { ProfileModule } from "./modules/iam/profile/profile.module";
 import { IdentityModule } from "./modules/iam/identity/identity.module";
+import { AuthModule } from "./modules/iam/auth/auth.module";
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { IdentityModule } from "./modules/iam/identity/identity.module";
     UserModule,
     ProfileModule,
     IdentityModule,
+    AuthModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

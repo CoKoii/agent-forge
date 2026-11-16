@@ -14,18 +14,18 @@ export class BaseEntity {
   @CreateDateColumn({ comment: "创建时间", select: false })
   createdAt: Date;
 
-  @Column({ comment: "创建人ID", select: false })
+  @Column({ comment: "创建人ID", select: false, nullable: true })
   createdBy: number;
 
   @UpdateDateColumn({ comment: "更新时间", select: false })
   updatedAt: Date;
 
-  @Column({ comment: "更新人ID", select: false })
+  @Column({ comment: "更新人ID", select: false, nullable: true })
   updatedBy: number;
 
   @DeleteDateColumn({ comment: "软删除时间", select: false })
   deletedAt: Date;
 
-  @Column({ comment: "删除人ID", select: false })
+  @Column({ comment: "删除人ID", select: false, nullable: true })
   deletedBy: number;
 }
