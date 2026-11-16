@@ -10,12 +10,7 @@ import { Observable, defer, map } from "rxjs";
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {
   // 统一响应格式
-  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
-    return defer(() => next.handle()).pipe(
-      map((result) => ({
-        code: 0,
-        data: result ?? null,
-      })),
-    );
+  intercept(_context: ExecutionContext, next: CallHandler): Observable<unknown> {
+    return defer(() => next.handle()).pipe(map((result) => ({ code: 0, data: result ?? null })));
   }
 }
