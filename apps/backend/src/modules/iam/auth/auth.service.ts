@@ -6,6 +6,7 @@ import { User } from "../user/entities/user.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { DataSource, Repository } from "typeorm";
 import { Identity } from "../identity/entities/identity.entity";
+import { Profile } from "../profile/entities/profile.entity";
 import * as argon2 from "argon2";
 
 @Injectable()
@@ -30,6 +31,12 @@ export class AuthService {
 
     await this.dataSource.transaction(async (manager) => {
       const user = await manager.save(manager.create(User));
+      await manager.save(
+        manager.create(Profile, {
+          nickname: email.split("@")[0],
+          user,
+        }),
+      );
       await manager.save(
         manager.create(Identity, {
           provider: "password",
