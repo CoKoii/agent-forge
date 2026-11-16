@@ -48,7 +48,7 @@ strictPeerDependencies: false
 autoInstallPeers: true
 allowBuilds:
   "@parcel/watcher": true
-  argon2: set this to true or false
+  argon2: true
   core-js: true
   esbuild: true
   lefthook: true

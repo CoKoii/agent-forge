@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, OneToOne } from "typeorm";
 import { BaseEntity } from "../../../../common/entities/base.entity";
 import { User } from "../../user/entities/user.entity";
 
-@Entity("profiles")
+@Entity("profiles", { comment: "用户资料" })
 export class Profile extends BaseEntity {
   @Column({ comment: "用户昵称" })
   nickname: string;
