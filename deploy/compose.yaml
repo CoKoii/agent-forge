@@ -6,31 +6,26 @@ services:
     restart: unless-stopped
 
     environment:
-      POSTGRES_USER: ${DB_USERNAME:-agent_forge}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:?请设置 DB_PASSWORD}
-      POSTGRES_DB: ${DB_DATABASE:-agent_forge}
+      POSTGRES_USER: "cao_kai"
+      POSTGRES_PASSWORD: "CaoKai1026"
+      POSTGRES_DB: "agent_forge"
 
-    ports:
-      - target: 5432
-        published: "${DB_PORT:-5432}"
-        host_ip: 127.0.0.1
-        protocol: tcp
+    ports: ["127.0.0.1:5432:5432"]
 
     volumes:
       - postgres-data:/var/lib/postgresql
 
-    healthcheck:
-      test: ["CMD-SHELL", 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
 
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "3"
+    ports: ["127.0.0.1:6379:6379"]
+
+    volumes:
+      - redis-data:/data
+
+    command: ["redis-server", "--appendonly", "yes"]
 
 volumes:
   postgres-data:
+  redis-data:
