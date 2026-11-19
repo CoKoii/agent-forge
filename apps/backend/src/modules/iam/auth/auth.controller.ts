@@ -1,40 +1,31 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from "@nestjs/common";
+import { Body, Controller, Post, Res } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import type { FastifyReply } from "fastify";
 import { AuthService } from "./auth.service";
-import { CreateAuthDto } from "./dto/create-auth.dto";
-import { UpdateAuthDto } from "./dto/update-auth.dto";
 import { RegisterDto } from "./dto/register.dto";
 
 @Controller("auth")
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Post("register")
-  register(@Body() registerDto: RegisterDto) {
-    return this.authService.register(registerDto);
-  }
+  async register(
+    @Body() registerDto: RegisterDto,
+    @Res({ passthrough: true }) reply: FastifyReply,
+  ) {
+    const { accessToken, refreshToken } = await this.authService.register(registerDto);
 
-  @Post()
-  create(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.create(createAuthDto);
-  }
+    reply.setCookie("refresh_token", refreshToken, {
+      httpOnly: true,
+      secure: this.configService.get("NODE_ENV") === "production",
+      sameSite: "lax",
+      path: "/api/v1/auth",
+      maxAge: this.configService.getOrThrow<number>("JWT_REFRESH_EXPIRES_IN"),
+    });
 
-  @Get()
-  findAll() {
-    return this.authService.findAll();
-  }
-
-  @Get(":id")
-  findOne(@Param("id") id: string) {
-    return this.authService.findOne(+id);
-  }
-
-  @Patch(":id")
-  update(@Param("id") id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
-  }
-
-  @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.authService.remove(+id);
+    return { accessToken };
   }
 }

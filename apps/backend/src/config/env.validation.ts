@@ -8,6 +8,12 @@ export const envValidationSchema = joi.object({
   LOG_LEVEL: joi.string().required(),
   // CORS 跨域
   CORS_ORIGIN: joi.string().min(1).required(),
+  // JWT 密钥
+  JWT_ACCESS_SECRET: joi.string().min(32).required(),
+  // Access Token 过期时间
+  JWT_ACCESS_EXPIRES_IN: joi.number().integer().min(1).required(),
+  // Refresh Token 过期时间
+  JWT_REFRESH_EXPIRES_IN: joi.number().integer().min(1).required(),
 
   // =========================数据库配置=========================
   // 主机
@@ -26,13 +32,10 @@ export const envValidationSchema = joi.object({
   // =========================Redis 配置=========================
   // 主机
   REDIS_HOST: joi.string().min(1).required(),
-
   // 端口
   REDIS_PORT: joi.number().port().required(),
-
   // 密码，允许为空但必须定义
   REDIS_PASSWORD: joi.string().allow("").required(),
-
   // 数据库编号
   REDIS_DB: joi.number().integer().min(0).required(),
 });

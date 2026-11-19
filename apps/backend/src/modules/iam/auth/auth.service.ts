@@ -1,19 +1,23 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { CreateAuthDto } from "./dto/create-auth.dto";
-import { UpdateAuthDto } from "./dto/update-auth.dto";
-import { RegisterDto } from "./dto/register.dto";
-import { User } from "../user/entities/user.entity";
+import { ConfigService } from "@nestjs/config";
+import { JwtService } from "@nestjs/jwt";
 import { InjectRepository } from "@nestjs/typeorm";
+import { createHash, randomBytes } from "node:crypto";
 import { DataSource, Repository } from "typeorm";
+import * as argon2 from "argon2";
 import { Identity } from "../identity/entities/identity.entity";
 import { Profile } from "../profile/entities/profile.entity";
-import * as argon2 from "argon2";
+import { User } from "../user/entities/user.entity";
+import { RegisterDto } from "./dto/register.dto";
+import { RefreshSession } from "./entities/refresh-session.entity";
 
 @Injectable()
 export class AuthService {
   // =========================依赖注入=========================
   constructor(
     private readonly dataSource: DataSource,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
     @InjectRepository(Identity)
     private readonly identityRepository: Repository<Identity>,
   ) {}
@@ -33,8 +37,15 @@ export class AuthService {
       throw new HttpException("该邮箱已注册", HttpStatus.CONFLICT);
     }
 
+    // 密码哈希
+    const passwordHash = await argon2.hash(password);
+
+    // 生成刷新令牌和过期时间
+    const refreshToken = randomBytes(32).toString("base64url");
+    const refreshExpiresIn = this.configService.getOrThrow<number>("JWT_REFRESH_EXPIRES_IN");
+
     // 在同一事务中创建账号、资料和登录身份
-    await this.dataSource.transaction(async (manager) => {
+    return this.dataSource.transaction(async (manager) => {
       // 创建用户账号
       const user = await manager.save(manager.create(User));
       // 创建用户资料，并用邮箱前缀初始化昵称
@@ -49,32 +60,23 @@ export class AuthService {
         manager.create(Identity, {
           provider: "password",
           providerSubject: email,
-          passwordHash: await argon2.hash(password),
+          passwordHash,
           user,
         }),
       );
+
+      const accessToken = await this.jwtService.signAsync({
+        sub: String(user.id),
+      });
+
+      await manager.save(
+        manager.create(RefreshSession, {
+          tokenHash: createHash("sha256").update(refreshToken).digest("hex"),
+          user,
+          expiresAt: new Date(Date.now() + refreshExpiresIn * 1000),
+        }),
+      );
+      return { accessToken, refreshToken };
     });
-
-    return "注册成功";
-  }
-
-  create(createAuthDto: CreateAuthDto) {
-    return "This action adds a new auth";
-  }
-
-  findAll() {
-    return `This action returns all auth`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
   }
 }
