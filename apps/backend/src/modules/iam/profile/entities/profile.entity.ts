@@ -13,7 +13,7 @@ export class Profile extends BaseEntity {
   @Column({ comment: "用户简介", nullable: true })
   bio: string;
 
-  @OneToOne(() => User, (user) => user.profile)
+  @OneToOne(() => User, (user) => user.profile, { onDelete: "CASCADE" })
   @JoinColumn()
   user: User;
 }

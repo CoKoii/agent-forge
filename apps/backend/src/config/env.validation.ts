@@ -2,6 +2,8 @@ import joi from "joi";
 
 export const envValidationSchema = joi.object({
   // =========================基础服务配置=========================
+  // 运行环境
+  NODE_ENV: joi.string().valid("development", "production").required(),
   // 端口
   PORT: joi.number().port().required(),
   // 日志等级

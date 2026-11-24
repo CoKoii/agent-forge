@@ -13,45 +13,40 @@ export class AuthController {
   ) {}
 
   @Post("register")
-  async register(
-    @Body() registerDto: RegisterDto,
-    @Res({ passthrough: true }) reply: FastifyReply,
-  ) {
-    const { accessToken, refreshToken } = await this.authService.register(registerDto);
-
-    this.setRefreshTokenCookie(reply, refreshToken);
-
-    return { accessToken };
+  async register(@Body() dto: RegisterDto, @Res({ passthrough: true }) reply: FastifyReply) {
+    return this.respond(reply, await this.authService.register(dto));
   }
 
   @Post("login")
-  async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) reply: FastifyReply) {
-    const { accessToken, refreshToken } = await this.authService.login(loginDto);
-
-    this.setRefreshTokenCookie(reply, refreshToken);
-
-    return { accessToken };
+  async login(@Body() dto: LoginDto, @Res({ passthrough: true }) reply: FastifyReply) {
+    return this.respond(reply, await this.authService.login(dto));
   }
 
   @Post("refresh")
   async refresh(@Req() request: FastifyRequest, @Res({ passthrough: true }) reply: FastifyReply) {
-    // 令牌缺失由服务层统一校验
-    const { accessToken, refreshToken } = await this.authService.refresh(
-      request.cookies["refresh_token"],
-    );
-
-    this.setRefreshTokenCookie(reply, refreshToken);
-
-    return { accessToken };
+    return this.respond(reply, await this.authService.refresh(request.cookies["refresh_token"]));
   }
 
-  // =========================刷新令牌 Cookie=========================
-  private setRefreshTokenCookie(reply: FastifyReply, refreshToken: string) {
+  @Post("logout")
+  async logout(@Req() request: FastifyRequest, @Res({ passthrough: true }) reply: FastifyReply) {
+    await this.authService.logout(request.cookies["refresh_token"]);
+
+    // Path 需与写入时一致，否则清不掉 Cookie
+    reply.clearCookie("refresh_token", { path: "/" });
+  }
+
+  private respond(
+    reply: FastifyReply,
+    { accessToken, refreshToken }: { accessToken: string; refreshToken: string },
+  ) {
     reply.setCookie("refresh_token", refreshToken, {
       httpOnly: true,
       secure: this.configService.get("NODE_ENV") === "production",
       sameSite: "lax",
+      path: "/",
       maxAge: this.configService.getOrThrow<number>("JWT_REFRESH_EXPIRES_IN"),
     });
+
+    return { accessToken };
   }
 }

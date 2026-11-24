@@ -8,7 +8,7 @@ export class User extends BaseEntity {
   @Column({ comment: "用户状态", default: "active" })
   status: "active" | "disabled";
 
-  @OneToOne(() => Profile, (profile) => profile.user, { cascade: true })
+  @OneToOne(() => Profile, (profile) => profile.user)
   profile: Profile;
 
   @OneToMany(() => Identity, (identity) => identity.user)

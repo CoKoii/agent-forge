@@ -8,13 +8,13 @@ export class Identity extends BaseEntity {
   @Column({ comment: "身份提供者" })
   provider: string;
 
-  @Column({ comment: "提供者主体" })
+  @Column({ type: "citext", comment: "提供者主体" })
   providerSubject: string;
 
   @Column({ comment: "密码哈希" })
   passwordHash: string;
 
-  @ManyToOne(() => User, (user) => user.identities)
+  @ManyToOne(() => User, (user) => user.identities, { onDelete: "CASCADE" })
   @JoinColumn()
   user: User;
 }
