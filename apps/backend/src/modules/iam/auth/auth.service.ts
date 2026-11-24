@@ -109,23 +109,22 @@ export class AuthService {
     const tokenHash = createHash("sha256").update(refreshToken).digest("hex");
 
     return this.dataSource.transaction(async (manager) => {
-      const sessionRepository = manager.getRepository(RefreshSession);
-
-      // 锁定旧会话，避免同一个令牌被并发刷新两次
-      const session = await sessionRepository
-        .createQueryBuilder("session")
-        .setLock("pessimistic_write")
-        .leftJoinAndSelect("session.user", "user")
-        .where("session.tokenHash = :tokenHash", { tokenHash })
-        .getOne();
+      // 只锁会话行，避免同一个令牌被并发刷新两次
+      const session = await manager.findOne(RefreshSession, {
+        where: { tokenHash },
+        lock: { mode: "pessimistic_write" },
+      });
 
       // 令牌不存在或已过期，一律按无效处理
       if (!session || session.expiresAt.getTime() <= Date.now()) {
         throw new HttpException("刷新令牌无效", HttpStatus.UNAUTHORIZED);
       }
 
+      // 单独取用户，避免关联查询把用户表也拖进锁范围
+      const user = await manager.findOneByOrFail(User, { id: session.userId });
+
       // 禁用账号不再签发新的令牌
-      if (session.user.status === "disabled") {
+      if (user.status === "disabled") {
         throw new HttpException("账号已被禁用", HttpStatus.FORBIDDEN);
       }
 
@@ -133,7 +132,7 @@ export class AuthService {
       await manager.delete(RefreshSession, { id: session.id });
 
       // 滑动到期：新会话从现在重新计算有效期
-      return this.issueTokens(manager, session.user);
+      return this.issueTokens(manager, user);
     });
   }
 
