@@ -22,7 +22,6 @@ export class AuthController {
       httpOnly: true,
       secure: this.configService.get("NODE_ENV") === "production",
       sameSite: "lax",
-      path: "/api/v1/auth",
       maxAge: this.configService.getOrThrow<number>("JWT_REFRESH_EXPIRES_IN"),
     });
 
