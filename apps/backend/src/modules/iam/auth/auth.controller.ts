@@ -2,6 +2,7 @@ import { Body, Controller, Post, Res } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import type { FastifyReply } from "fastify";
 import { AuthService } from "./auth.service";
+import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
 
 @Controller("auth")
@@ -18,13 +19,27 @@ export class AuthController {
   ) {
     const { accessToken, refreshToken } = await this.authService.register(registerDto);
 
+    this.setRefreshTokenCookie(reply, refreshToken);
+
+    return { accessToken };
+  }
+
+  @Post("login")
+  async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) reply: FastifyReply) {
+    const { accessToken, refreshToken } = await this.authService.login(loginDto);
+
+    this.setRefreshTokenCookie(reply, refreshToken);
+
+    return { accessToken };
+  }
+
+  // =========================刷新令牌 Cookie=========================
+  private setRefreshTokenCookie(reply: FastifyReply, refreshToken: string) {
     reply.setCookie("refresh_token", refreshToken, {
       httpOnly: true,
       secure: this.configService.get("NODE_ENV") === "production",
       sameSite: "lax",
       maxAge: this.configService.getOrThrow<number>("JWT_REFRESH_EXPIRES_IN"),
     });
-
-    return { accessToken };
   }
 }
