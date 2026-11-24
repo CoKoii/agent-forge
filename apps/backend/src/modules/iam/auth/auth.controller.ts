@@ -1,6 +1,6 @@
-import { Body, Controller, Post, Res } from "@nestjs/common";
+import { Body, Controller, Post, Req, Res } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import type { FastifyReply } from "fastify";
+import type { FastifyReply, FastifyRequest } from "fastify";
 import { AuthService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
@@ -27,6 +27,18 @@ export class AuthController {
   @Post("login")
   async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) reply: FastifyReply) {
     const { accessToken, refreshToken } = await this.authService.login(loginDto);
+
+    this.setRefreshTokenCookie(reply, refreshToken);
+
+    return { accessToken };
+  }
+
+  @Post("refresh")
+  async refresh(@Req() request: FastifyRequest, @Res({ passthrough: true }) reply: FastifyReply) {
+    // 令牌缺失由服务层统一校验
+    const { accessToken, refreshToken } = await this.authService.refresh(
+      request.cookies["refresh_token"],
+    );
 
     this.setRefreshTokenCookie(reply, refreshToken);
 

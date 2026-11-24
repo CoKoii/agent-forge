@@ -98,6 +98,45 @@ export class AuthService {
     });
   }
 
+  // =========================刷新令牌=========================
+  async refresh(refreshToken?: string) {
+    // 缺少令牌与令牌无效统一按未授权处理
+    if (!refreshToken) {
+      throw new HttpException("刷新令牌无效", HttpStatus.UNAUTHORIZED);
+    }
+
+    // 对客户端传来的明文令牌做哈希，再按哈希查会话
+    const tokenHash = createHash("sha256").update(refreshToken).digest("hex");
+
+    return this.dataSource.transaction(async (manager) => {
+      const sessionRepository = manager.getRepository(RefreshSession);
+
+      // 锁定旧会话，避免同一个令牌被并发刷新两次
+      const session = await sessionRepository
+        .createQueryBuilder("session")
+        .setLock("pessimistic_write")
+        .leftJoinAndSelect("session.user", "user")
+        .where("session.tokenHash = :tokenHash", { tokenHash })
+        .getOne();
+
+      // 令牌不存在或已过期，一律按无效处理
+      if (!session || session.expiresAt.getTime() <= Date.now()) {
+        throw new HttpException("刷新令牌无效", HttpStatus.UNAUTHORIZED);
+      }
+
+      // 禁用账号不再签发新的令牌
+      if (session.user.status === "disabled") {
+        throw new HttpException("账号已被禁用", HttpStatus.FORBIDDEN);
+      }
+
+      // 物理删除旧会话，完成令牌轮换
+      await manager.delete(RefreshSession, { id: session.id });
+
+      // 滑动到期：新会话从现在重新计算有效期
+      return this.issueTokens(manager, session.user);
+    });
+  }
+
   // =========================签发令牌=========================
   private async issueTokens(manager: EntityManager, user: User) {
     // 生成刷新令牌和过期时间
