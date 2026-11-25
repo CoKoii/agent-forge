@@ -40,4 +40,12 @@ export const envValidationSchema = joi.object({
   REDIS_PASSWORD: joi.string().allow("").required(),
   // 数据库编号
   REDIS_DB: joi.number().integer().min(0).required(),
+
+  // =========================GitHub OAuth 配置=========================
+  // 客户端 ID
+  GITHUB_CLIENT_ID: joi.string().allow("").optional(),
+  // 客户端密钥
+  GITHUB_CLIENT_SECRET: joi.string().allow("").optional(),
+  // 授权回调地址
+  GITHUB_CALLBACK_URL: joi.string().uri().allow("").optional(),
 });

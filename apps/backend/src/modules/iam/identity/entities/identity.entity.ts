@@ -11,7 +11,7 @@ export class Identity extends BaseEntity {
   @Column({ type: "citext", comment: "提供者主体" })
   providerSubject: string;
 
-  @Column({ comment: "密码哈希" })
+  @Column({ nullable: true, comment: "密码哈希" })
   passwordHash: string;
 
   @ManyToOne(() => User, (user) => user.identities, { onDelete: "CASCADE" })

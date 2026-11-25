@@ -74,7 +74,7 @@ export class AuthService {
     });
 
     // 统一提示，不暴露邮箱是否已注册
-    if (!identity || !(await argon2.verify(identity.passwordHash, password))) {
+    if (!identity?.passwordHash || !(await argon2.verify(identity.passwordHash, password))) {
       throw new HttpException("邮箱或密码错误", HttpStatus.UNAUTHORIZED);
     }
 
