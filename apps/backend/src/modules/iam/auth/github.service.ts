@@ -21,7 +21,7 @@ export class GithubService {
     { code, state, error }: { code?: string; state?: string; error?: string },
     cookieState?: string,
   ) {
-    if (error || !code || cookieState !== state) {
+    if (error || !code || !state || cookieState !== state) {
       throw new HttpException("GitHub 授权失败", HttpStatus.UNAUTHORIZED);
     }
 
