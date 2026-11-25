@@ -7,7 +7,6 @@ import { RegisterDto } from "./dto/register.dto";
 
 @Controller("auth")
 export class AuthController {
-  // =========================依赖注入=========================
   constructor(
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
