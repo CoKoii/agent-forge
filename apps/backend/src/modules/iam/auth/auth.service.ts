@@ -25,39 +25,23 @@ export class AuthService {
   ) {}
 
   // =========================用户注册=========================
-  async register({ email, password }: RegisterDto) {
-    // 密码只保存哈希
-    const passwordHash = await argon2.hash(password);
+  async register(dto: RegisterDto) {
+    const passwordHash = await argon2.hash(dto.password);
 
     try {
-      // 账号、资料、身份在同一事务内创建
-      return await this.dataSource.transaction(async (manager) => {
-        // 创建用户账号
-        const user = await manager.save(manager.create(User));
-
-        // 创建用户资料，昵称取邮箱前缀
-        await manager.save(
-          manager.create(Profile, {
-            nickname: email.split("@")[0],
-            user,
-          }),
-        );
-
-        // 创建密码登录身份
-        await manager.save(
-          manager.create(Identity, {
+      return await this.dataSource.transaction((manager) =>
+        this.createAccount(
+          manager,
+          { nickname: dto.email.split("@")[0] },
+          {
             provider: "password",
-            providerSubject: email,
+            providerSubject: dto.email,
             passwordHash,
-            user,
-          }),
-        );
-
-        return this.issueTokens(user, manager);
-      });
+          },
+        ),
+      );
     } catch (error) {
-      // 唯一约束冲突说明邮箱已注册
-      if (error instanceof QueryFailedError && error.driverError.code === "23505") {
+      if (this.isUniqueViolation(error)) {
         throw new HttpException("该邮箱已注册", HttpStatus.CONFLICT);
       }
 
@@ -66,27 +50,55 @@ export class AuthService {
   }
 
   // =========================用户登录=========================
-  async login({ email, password }: LoginDto) {
-    // 按邮箱查找密码登录身份
-    const identity = await this.identityRepository.findOne({
-      where: { provider: "password", providerSubject: email },
-      relations: { user: true },
-    });
+  async login(dto: LoginDto) {
+    const identity = await this.findIdentity("password", dto.email);
 
     // 统一提示，不暴露邮箱是否已注册
-    if (!identity?.passwordHash || !(await argon2.verify(identity.passwordHash, password))) {
+    if (!identity?.passwordHash || !(await argon2.verify(identity.passwordHash, dto.password))) {
       throw new HttpException("邮箱或密码错误", HttpStatus.UNAUTHORIZED);
     }
 
-    // 禁用账号不允许登录
     this.assertActive(identity.user);
 
     return this.issueTokens(identity.user);
   }
 
+  // =========================GitHub 登录=========================
+  async githubLogin(githubUser: any) {
+    if (typeof githubUser?.id !== "number") {
+      throw new HttpException("获取 GitHub 用户信息失败", HttpStatus.BAD_GATEWAY);
+    }
+
+    const providerSubject = String(githubUser.id);
+    const identity = await this.findIdentity("github", providerSubject);
+
+    const profile: Partial<Profile> = {
+      nickname: githubUser.name ?? githubUser.login,
+      avatarUrl: githubUser.avatar_url,
+      bio: githubUser.bio,
+    };
+
+    if (identity) {
+      this.assertActive(identity.user);
+      await this.syncProfile(identity.user, profile);
+      return this.issueTokens(identity.user);
+    }
+
+    try {
+      return await this.dataSource.transaction((manager) =>
+        this.createAccount(manager, profile, { provider: "github", providerSubject }),
+      );
+    } catch (error) {
+      if (this.isUniqueViolation(error)) {
+        throw new HttpException("登录处理失败，请重试", HttpStatus.CONFLICT);
+      }
+
+      throw error;
+    }
+  }
+
   // =========================刷新令牌=========================
   async refresh(refreshToken?: string) {
-    // 缺少令牌与令牌无效统一返回未授权
     if (!refreshToken) {
       throw new HttpException("刷新令牌无效", HttpStatus.UNAUTHORIZED);
     }
@@ -98,7 +110,6 @@ export class AuthService {
         lock: { mode: "pessimistic_write" },
       });
 
-      // 会话不存在或已过期都按无效处理
       if (!session || session.expiresAt.getTime() <= Date.now()) {
         throw new HttpException("刷新令牌无效", HttpStatus.UNAUTHORIZED);
       }
@@ -107,7 +118,6 @@ export class AuthService {
       const user = await manager.findOneByOrFail(User, { id: session.userId });
       this.assertActive(user);
 
-      // 轮换令牌：删除旧会话
       await manager.delete(RefreshSession, { id: session.id });
 
       return this.issueTokens(user, manager);
@@ -116,7 +126,6 @@ export class AuthService {
 
   // =========================退出登录=========================
   async logout(refreshToken?: string) {
-    // 无令牌时直接返回，Cookie 由控制器清理
     if (refreshToken) {
       await this.refreshSessionRepository.delete({ tokenHash: this.hashToken(refreshToken) });
     }
@@ -124,14 +133,12 @@ export class AuthService {
 
   // =========================签发令牌=========================
   private async issueTokens(user: User, manager: EntityManager = this.dataSource.manager) {
-    // 生成刷新令牌、访问令牌和会话过期时间
     const refreshToken = randomBytes(32).toString("base64url");
     const accessToken = await this.jwtService.signAsync({ sub: String(user.id) });
     const expiresAt = new Date(
       Date.now() + this.configService.getOrThrow<number>("JWT_REFRESH_EXPIRES_IN") * 1000,
     );
 
-    // 清理该用户已过期的会话
     await manager.delete(RefreshSession, { userId: user.id, expiresAt: LessThan(new Date()) });
 
     // 数据库只保存刷新令牌哈希
@@ -144,6 +151,42 @@ export class AuthService {
     );
 
     return { accessToken, refreshToken };
+  }
+
+  // =========================账号创建=========================
+  // 账号、资料、身份在同一事务内创建
+  private async createAccount(
+    manager: EntityManager,
+    profile: Partial<Profile>,
+    identity: Partial<Identity>,
+  ) {
+    const user = await manager.save(manager.create(User));
+
+    await manager.save(manager.create(Profile, { ...profile, user }));
+
+    await manager.save(manager.create(Identity, { ...identity, user }));
+
+    return this.issueTokens(user, manager);
+  }
+
+  // =========================资料同步=========================
+  private async syncProfile(user: User, profile: Partial<Profile>) {
+    const existing = await this.dataSource.manager.findOneBy(Profile, { user: { id: user.id } });
+
+    if (existing) {
+      await this.dataSource.manager.update(Profile, existing.id, profile);
+    }
+  }
+
+  private findIdentity(provider: string, providerSubject: string) {
+    return this.identityRepository.findOne({
+      where: { provider, providerSubject },
+      relations: { user: true },
+    });
+  }
+
+  private isUniqueViolation(error: unknown) {
+    return error instanceof QueryFailedError && error.driverError.code === "23505";
   }
 
   private assertActive(user: User) {
