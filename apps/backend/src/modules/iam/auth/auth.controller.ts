@@ -6,12 +6,14 @@ import { AuthService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
 import { GithubService } from "./github.service";
+import { GoogleService } from "./google.service";
 
 @Controller("auth")
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly githubService: GithubService,
+    private readonly googleService: GoogleService,
     private readonly configService: ConfigService,
   ) {}
 
@@ -30,19 +32,7 @@ export class AuthController {
   // =========================GitHub 登录=========================
   @Get("github")
   github(@Res() reply: FastifyReply) {
-    const state = randomBytes(16).toString("base64url");
-    reply.setCookie("github_state", state, {
-      httpOnly: true,
-      secure: this.configService.get("NODE_ENV") === "production",
-      sameSite: "lax",
-      path: "/api/v1/auth",
-      maxAge: 600,
-    });
-
-    reply
-      .status(HttpStatus.FOUND)
-      .header("Location", this.githubService.authorizeUrl(state))
-      .send();
+    this.startAuth(reply, "github_state", (state) => this.githubService.authorizeUrl(state));
   }
 
   // =========================GitHub 回调=========================
@@ -57,6 +47,26 @@ export class AuthController {
     const user = await this.githubService.authorize(query, request.cookies["github_state"]);
 
     return this.respond(reply, await this.authService.githubLogin(user));
+  }
+
+  // =========================Google 登录=========================
+  @Get("google")
+  google(@Res() reply: FastifyReply) {
+    this.startAuth(reply, "google_state", (state) => this.googleService.authorizeUrl(state));
+  }
+
+  // =========================Google 回调=========================
+  @Get("google/callback")
+  async googleCallback(
+    @Query() query: { code?: string; state?: string; error?: string },
+    @Req() request: FastifyRequest,
+    @Res({ passthrough: true }) reply: FastifyReply,
+  ) {
+    reply.clearCookie("google_state", { path: "/api/v1/auth" });
+
+    const user = await this.googleService.authorize(query, request.cookies["google_state"]);
+
+    return this.respond(reply, await this.authService.googleLogin(user));
   }
 
   // =========================刷新令牌=========================
@@ -81,12 +91,35 @@ export class AuthController {
   ) {
     reply.setCookie("refresh_token", refreshToken, {
       httpOnly: true,
-      secure: this.configService.get("NODE_ENV") === "production",
+      secure: this.isProduction,
       sameSite: "lax",
       path: "/",
       maxAge: this.configService.getOrThrow<number>("JWT_REFRESH_EXPIRES_IN"),
     });
 
     return { accessToken };
+  }
+
+  // =========================第三方登录入口=========================
+  private startAuth(
+    reply: FastifyReply,
+    cookieName: string,
+    authorizeUrl: (state: string) => string,
+  ) {
+    const state = randomBytes(16).toString("base64url");
+
+    reply.setCookie(cookieName, state, {
+      httpOnly: true,
+      secure: this.isProduction,
+      sameSite: "lax",
+      path: "/api/v1/auth",
+      maxAge: 600,
+    });
+
+    reply.status(HttpStatus.FOUND).header("Location", authorizeUrl(state)).send();
+  }
+
+  private get isProduction() {
+    return this.configService.get("NODE_ENV") === "production";
   }
 }

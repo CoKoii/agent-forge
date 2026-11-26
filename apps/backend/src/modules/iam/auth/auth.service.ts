@@ -69,14 +69,32 @@ export class AuthService {
       throw new HttpException("获取 GitHub 用户信息失败", HttpStatus.BAD_GATEWAY);
     }
 
-    const providerSubject = String(githubUser.id);
-    const identity = await this.findIdentity("github", providerSubject);
-
-    const profile: Partial<Profile> = {
+    return this.loginWithProvider("github", String(githubUser.id), {
       nickname: githubUser.name ?? githubUser.login,
       avatarUrl: githubUser.avatar_url,
       bio: githubUser.bio,
-    };
+    });
+  }
+
+  // =========================Google 登录=========================
+  async googleLogin(googleUser: any) {
+    if (typeof googleUser?.sub !== "string") {
+      throw new HttpException("获取 Google 用户信息失败", HttpStatus.BAD_GATEWAY);
+    }
+
+    return this.loginWithProvider("google", googleUser.sub, {
+      nickname: googleUser.name ?? googleUser.email?.split("@")[0],
+      avatarUrl: googleUser.picture,
+    });
+  }
+
+  // =========================第三方登录=========================
+  private async loginWithProvider(
+    provider: string,
+    providerSubject: string,
+    profile: Partial<Profile>,
+  ) {
+    const identity = await this.findIdentity(provider, providerSubject);
 
     if (identity) {
       this.assertActive(identity.user);
@@ -86,7 +104,7 @@ export class AuthService {
 
     try {
       return await this.dataSource.transaction((manager) =>
-        this.createAccount(manager, profile, { provider: "github", providerSubject }),
+        this.createAccount(manager, profile, { provider, providerSubject }),
       );
     } catch (error) {
       if (this.isUniqueViolation(error)) {

@@ -7,6 +7,7 @@ import { RefreshSession } from "./entities/refresh-session.entity";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { GithubService } from "./github.service";
+import { GoogleService } from "./google.service";
 
 @Module({
   imports: [
@@ -22,6 +23,6 @@ import { GithubService } from "./github.service";
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, GithubService],
+  providers: [AuthService, GithubService, GoogleService],
 })
 export class AuthModule {}

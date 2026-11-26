@@ -48,4 +48,12 @@ export const envValidationSchema = joi.object({
   GITHUB_CLIENT_SECRET: joi.string().allow("").optional(),
   // 授权回调地址
   GITHUB_CALLBACK_URL: joi.string().uri().allow("").optional(),
+
+  // =========================Google OAuth 配置=========================
+  // 客户端 ID
+  GOOGLE_CLIENT_ID: joi.string().allow("").optional(),
+  // 客户端密钥
+  GOOGLE_CLIENT_SECRET: joi.string().allow("").optional(),
+  // 授权回调地址
+  GOOGLE_CALLBACK_URL: joi.string().uri().allow("").optional(),
 });

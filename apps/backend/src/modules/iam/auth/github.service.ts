@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { fetchWithTimeout } from "./fetch-with-timeout";
 
 @Injectable()
 export class GithubService {
@@ -64,11 +65,7 @@ export class GithubService {
   }
 
   // =========================请求封装=========================
-  private async request(url: string, init: RequestInit) {
-    try {
-      return await fetch(url, { ...init, signal: AbortSignal.timeout(5000) });
-    } catch {
-      throw new HttpException("GitHub 服务不可用", HttpStatus.BAD_GATEWAY);
-    }
+  private request(url: string, init: RequestInit) {
+    return fetchWithTimeout(url, init, "GitHub 服务不可用");
   }
 }
