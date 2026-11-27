@@ -11,6 +11,7 @@ export class RefreshSession extends BaseEntity {
   @Column({ comment: "用户ID" })
   userId: number;
 
+  @Index()
   @Column({ type: "timestamptz", comment: "过期时间" })
   expiresAt: Date;
 

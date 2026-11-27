@@ -6,8 +6,9 @@ import { Identity } from "../identity/entities/identity.entity";
 import { RefreshSession } from "./entities/refresh-session.entity";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
-import { GithubService } from "./github.service";
-import { GoogleService } from "./google.service";
+import { GithubService } from "./oauth/github.service";
+import { GoogleService } from "./oauth/google.service";
+import { RefreshSessionCleanupService } from "./refresh-session-cleanup.service";
 
 @Module({
   imports: [
@@ -23,6 +24,6 @@ import { GoogleService } from "./google.service";
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, GithubService, GoogleService],
+  providers: [AuthService, GithubService, GoogleService, RefreshSessionCleanupService],
 })
 export class AuthModule {}

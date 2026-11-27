@@ -22,6 +22,7 @@
     "@nestjs/jwt": "catalog:",
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-fastify": "catalog:",
+    "@nestjs/schedule": "catalog:",
     "@nestjs/throttler": "catalog:",
     "@nestjs/typeorm": "catalog:",
     "argon2": "catalog:",

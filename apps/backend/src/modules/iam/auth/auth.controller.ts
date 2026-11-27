@@ -5,8 +5,8 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import { AuthService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
-import { GithubService } from "./github.service";
-import { GoogleService } from "./google.service";
+import { GithubService } from "./oauth/github.service";
+import { GoogleService } from "./oauth/google.service";
 
 @Controller("auth")
 export class AuthController {
