@@ -32,7 +32,7 @@ export class AuthController {
   // =========================GitHub 登录=========================
   @Get("github")
   github(@Res() reply: FastifyReply) {
-    this.startAuth(reply, "github_state", (state) => this.githubService.authorizeUrl(state));
+    this.startAuth(reply, "github", this.githubService);
   }
 
   // =========================GitHub 回调=========================
@@ -40,19 +40,23 @@ export class AuthController {
   async githubCallback(
     @Query() query: { code?: string; state?: string; error?: string },
     @Req() request: FastifyRequest,
-    @Res({ passthrough: true }) reply: FastifyReply,
+    @Res() reply: FastifyReply,
   ) {
     reply.clearCookie("github_state", { path: "/api/v1/auth" });
 
     const user = await this.githubService.authorize(query, request.cookies["github_state"]);
 
-    return this.respond(reply, await this.authService.githubLogin(user));
+    return this.respond(
+      reply,
+      await this.authService.githubLogin(user),
+      this.configService.getOrThrow("FRONTEND_URL"),
+    );
   }
 
   // =========================Google 登录=========================
   @Get("google")
   google(@Res() reply: FastifyReply) {
-    this.startAuth(reply, "google_state", (state) => this.googleService.authorizeUrl(state));
+    this.startAuth(reply, "google", this.googleService);
   }
 
   // =========================Google 回调=========================
@@ -60,13 +64,17 @@ export class AuthController {
   async googleCallback(
     @Query() query: { code?: string; state?: string; error?: string },
     @Req() request: FastifyRequest,
-    @Res({ passthrough: true }) reply: FastifyReply,
+    @Res() reply: FastifyReply,
   ) {
     reply.clearCookie("google_state", { path: "/api/v1/auth" });
 
     const user = await this.googleService.authorize(query, request.cookies["google_state"]);
 
-    return this.respond(reply, await this.authService.googleLogin(user));
+    return this.respond(
+      reply,
+      await this.authService.googleLogin(user),
+      this.configService.getOrThrow("FRONTEND_URL"),
+    );
   }
 
   // =========================刷新令牌=========================
@@ -84,18 +92,19 @@ export class AuthController {
     reply.clearCookie("refresh_token", { path: "/" });
   }
 
-  // =========================刷新令牌 Cookie=========================
+  // =========================统一响应=========================
   private respond(
     reply: FastifyReply,
     { accessToken, refreshToken }: { accessToken: string; refreshToken: string },
+    redirectTo?: string,
   ) {
-    reply.setCookie("refresh_token", refreshToken, {
-      httpOnly: true,
-      secure: this.isProduction,
-      sameSite: "lax",
-      path: "/",
-      maxAge: this.configService.getOrThrow<number>("JWT_REFRESH_EXPIRES_IN"),
-    });
+    reply.setCookie(
+      "refresh_token",
+      refreshToken,
+      this.cookieOptions("/", this.configService.getOrThrow<number>("JWT_REFRESH_EXPIRES_IN")),
+    );
+
+    if (redirectTo) reply.status(HttpStatus.FOUND).header("Location", redirectTo).send();
 
     return { accessToken };
   }
@@ -103,23 +112,23 @@ export class AuthController {
   // =========================第三方登录入口=========================
   private startAuth(
     reply: FastifyReply,
-    cookieName: string,
-    authorizeUrl: (state: string) => string,
+    provider: "github" | "google",
+    service: GithubService | GoogleService,
   ) {
     const state = randomBytes(16).toString("base64url");
 
-    reply.setCookie(cookieName, state, {
-      httpOnly: true,
-      secure: this.isProduction,
-      sameSite: "lax",
-      path: "/api/v1/auth",
-      maxAge: 600,
-    });
+    reply.setCookie(`${provider}_state`, state, this.cookieOptions("/api/v1/auth", 600));
 
-    reply.status(HttpStatus.FOUND).header("Location", authorizeUrl(state)).send();
+    reply.status(HttpStatus.FOUND).header("Location", service.authorizeUrl(state)).send();
   }
 
-  private get isProduction() {
-    return this.configService.get("NODE_ENV") === "production";
+  private cookieOptions(path: string, maxAge: number) {
+    return {
+      httpOnly: true,
+      secure: this.configService.get("NODE_ENV") === "production",
+      sameSite: "lax" as const,
+      path,
+      maxAge,
+    };
   }
 }

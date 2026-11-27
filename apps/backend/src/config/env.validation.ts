@@ -10,6 +10,8 @@ export const envValidationSchema = joi.object({
   LOG_LEVEL: joi.string().required(),
   // CORS 跨域
   CORS_ORIGIN: joi.string().min(1).required(),
+  // 前端地址
+  FRONTEND_URL: joi.string().uri().required(),
   // JWT 密钥
   JWT_ACCESS_SECRET: joi.string().min(32).required(),
   // Access Token 过期时间
